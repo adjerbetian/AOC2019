@@ -16,4 +16,12 @@ internal class PasswordTest {
         assertTrue(isPasswordValid(113456))
         assertFalse(isPasswordValid(112354))
     }
+
+    @Test
+    fun passwordShouldNotAcceptDoublesOfLargerGroup() {
+        assertTrue(isPasswordValid(112233))
+        assertFalse(isPasswordValid(123444))
+        assertTrue(isPasswordValid(111122))
+    }
+
 }

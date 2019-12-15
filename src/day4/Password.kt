@@ -6,8 +6,13 @@ fun isPasswordValid(password: Int): Boolean {
 
 fun hasPasswordDouble(password: Int): Boolean {
     val text = password.toString()
-    for (i in 0..text.length - 2) {
-        if (text[i] == text[i + 1]) return true
+    var i = 0
+    while (i < text.length) {
+        var j = i + 1
+        while (j < text.length && text[j] == text[i]) j++
+
+        if (j - i == 2) return true
+        i = j
     }
     return false
 }
