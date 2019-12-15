@@ -57,4 +57,84 @@ internal class OrbitSystemTest {
 
         assertEquals(42, system.getOrbitsSum())
     }
+
+    @Test
+    fun getPathToCOM() {
+        val map = listOf(
+            "COM)A",
+            "A)B",
+            "B)C",
+            "C)D",
+            "D)E"
+        )
+
+        val system = OrbitSystem(map)
+
+        assertArrayEquals(arrayOf("COM"), system.getPathToCOM("COM").toTypedArray())
+        assertArrayEquals(arrayOf("A", "COM"), system.getPathToCOM("A").toTypedArray())
+        assertArrayEquals(arrayOf("E", "D", "C", "B", "A", "COM"), system.getPathToCOM("E").toTypedArray())
+    }
+
+    @Test
+    fun getFirstCommonAncestor() {
+        val map = listOf(
+            "COM)B",
+            "B)C",
+            "C)D",
+            "D)E",
+            "E)F",
+            "B)G",
+            "G)H",
+            "D)I",
+            "E)J",
+            "J)K",
+            "K)L",
+            "K)YOU",
+            "I)SAN"
+        )
+
+        val system = OrbitSystem(map)
+
+        assertEquals("D", system.getFirstCommonAncestor("YOU", "SAN"))
+    }
+
+    @Test
+    fun getPathTo() {
+        val map = listOf(
+            "COM)A",
+            "A)B",
+            "B)C",
+            "C)D",
+            "D)E"
+        )
+
+        val system = OrbitSystem(map)
+
+        assertArrayEquals(arrayOf("COM"), system.getPath(from = "COM", to = "COM").toTypedArray())
+        assertArrayEquals(arrayOf("A", "COM"), system.getPath(from = "A", to = "COM").toTypedArray())
+        assertArrayEquals(arrayOf("E", "D", "C", "B"), system.getPath(from = "E", to = "B").toTypedArray())
+    }
+
+    @Test
+    fun getOrbitalTransfers() {
+        val map = listOf(
+            "COM)B",
+            "B)C",
+            "C)D",
+            "D)E",
+            "E)F",
+            "B)G",
+            "G)H",
+            "D)I",
+            "E)J",
+            "J)K",
+            "K)L",
+            "K)YOU",
+            "I)SAN"
+        )
+
+        val system = OrbitSystem(map)
+
+        assertEquals(6, system.getNOrbitalTransfers(from = "YOU", to = "SAN"))
+    }
 }

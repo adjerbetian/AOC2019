@@ -11,17 +11,42 @@ class OrbitSystem(orbitStringMap: OrbitMap) {
     }
 
     fun getDistanceToCOM(planet: Planet): Int {
-        var distance = 0
-        var currentPlanet = planet
-        while(currentPlanet != "COM") {
-            distance++
-            currentPlanet = getOrbitCenterOf(currentPlanet)
-        }
-        return distance
+        return getPathToCOM(planet).size - 1
     }
 
     fun getOrbitCenterOf(planet: Planet): Planet {
         return orbitMap[planet] ?: error("Planet not found")
+    }
+
+    fun getPathToCOM(planet: Planet): List<Planet> {
+        return getPath(from = planet, to = "COM")
+    }
+
+    fun getFirstCommonAncestor(p1: Planet, p2: Planet): Planet {
+        val path1 = getPathToCOM(p1)
+        val path2 = getPathToCOM(p2)
+
+        for(ancestor in path1) {
+            if(path2.contains(ancestor)) {
+                return ancestor
+            }
+        }
+        throw Error("No common ancestor")
+    }
+
+    fun getPath(from: Planet, to: Planet): List<Planet> {
+        var currentPlanet = from
+        val result = mutableListOf(currentPlanet)
+        while(currentPlanet != to) {
+            currentPlanet = getOrbitCenterOf(currentPlanet)
+            result.add(currentPlanet)
+        }
+        return result
+    }
+
+    fun getNOrbitalTransfers(from: Planet, to: Planet): Int {
+        val ancestor = getFirstCommonAncestor(from, to)
+        return getPath(from, ancestor).size - 1 + getPath(to, ancestor).size - 1
     }
 }
 
