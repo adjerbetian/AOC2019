@@ -4,8 +4,12 @@ import java.io.File
 
 fun main() {
     val (firstPath, secondPath) = readInput("src/day3/input.txt")
-    val result = findIntersection(firstPath, secondPath)
-    println("First intersection is at distance: $result")
+
+    val result1 = findClosestIntersection(firstPath, secondPath)
+    println("Closest intersection is at distance: $result1")
+
+    val result2 = findFirstIntersection(firstPath, secondPath)
+    println("First intersection is at distance: $result2")
 }
 
 fun readInput(stringPath: String): Pair<Path, Path> {

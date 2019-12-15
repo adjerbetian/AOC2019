@@ -50,7 +50,7 @@ internal class PositionTest {
 
     @Test
     fun getManhattanDistance() {
-        val result = Position(3, 5).getManhattanDistance()
+        val result = Position(-3, 5).getManhattanDistance()
 
         assertEquals(8, result)
     }

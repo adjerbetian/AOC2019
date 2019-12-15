@@ -1,5 +1,7 @@
 package day3
 
+import kotlin.math.abs
+
 data class Position(val x: Int, val y: Int) {
     fun move(direction: Direction): Position {
         return moveOf(direction, direction.distance)
@@ -19,6 +21,6 @@ data class Position(val x: Int, val y: Int) {
     }
 
     fun getManhattanDistance(): Int {
-        return x + y
+        return abs(x) + abs(y)
     }
 }
