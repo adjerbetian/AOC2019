@@ -17,4 +17,8 @@ class SpaceImage(width: Int, height: Int, format: String) {
     fun findMinLayerBy(matcher: (layer: Layer) -> Int): Layer {
         return layers.minBy(matcher)!!
     }
+
+    fun merge(): Layer {
+        return layers.reduce { result, layer -> result.mergeDownWith(layer) }
+    }
 }

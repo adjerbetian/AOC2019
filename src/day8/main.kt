@@ -7,6 +7,10 @@ fun main() {
     val image = SpaceImage(25, 6, input)
     val layer = image.findMinLayerBy { it.getNumberOf(0) }
     println("Number of 1 * 2 of the 0 min layer: ${layer.getNumberOf(1) * layer.getNumberOf(2)}")
+
+    val mergedImage = image.merge()
+    println(mergedImage.getCode())
+    println(mergedImage.getImage())
 }
 
 fun readInput(stringPath: String): String {
