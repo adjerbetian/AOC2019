@@ -1,6 +1,6 @@
 package day2
 
-import IntCode.IntCodeComputer
+import intCode.IntCodeComputer
 import java.io.File
 
 fun main() {
