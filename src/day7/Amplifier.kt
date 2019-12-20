@@ -7,9 +7,11 @@ class Amplifier(program: IntCodeProgram, val phase: Int) {
     val computer = IntCodeComputer(program)
     var outputAmplifier: Amplifier? = null
 
-    fun run(inputs: IntArray = intArrayOf()) {
-        computer.run(intArrayOf(phase) + inputs)
-        outputAmplifier?.run(computer.outputs.toIntArray())
+    fun run(inputs: MutableList<Int> = mutableListOf()) {
+        computer.addInput(phase)
+        computer.addInputs(inputs)
+        computer.run()
+        outputAmplifier?.run(computer.outputs)
     }
 
     fun branchTo(amp: Amplifier) {
@@ -21,18 +23,3 @@ class Amplifier(program: IntCodeProgram, val phase: Int) {
     }
 }
 
-class AmplificationCircuit(program: IntCodeProgram, phases: IntArray) {
-    private val amplifiers = phases.map { phase -> Amplifier(program, phase) }
-
-    init {
-        amplifiers.reduce { a, b -> a.branchTo(b); b }
-    }
-
-    fun run() {
-        amplifiers.first().run(intArrayOf(0))
-    }
-
-    fun getOutput(): Int {
-        return amplifiers.last().getOutput()
-    }
-}

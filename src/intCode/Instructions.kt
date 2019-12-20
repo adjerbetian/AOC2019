@@ -38,8 +38,7 @@ class Input : Instruction {
     override fun matches(opcode: Int) = opcode == 3
 
     override fun run(computer: IntCodeComputer) {
-        computer.memory[computer.getParam(1)] = computer.inputs[computer.inputPointer]
-        computer.inputPointer++
+        computer.memory[computer.getParam(1)] = computer.waitForNextInput()
         computer.instructionPointer += 2
     }
 }
@@ -49,7 +48,7 @@ class Output : Instruction {
 
     override fun run(computer: IntCodeComputer) {
         computer.outputs.add(computer.getParamValue(1))
-        computer.inputPointer++
+        computer.outputFunction(computer.getParamValue(1))
         computer.instructionPointer += 2
     }
 }

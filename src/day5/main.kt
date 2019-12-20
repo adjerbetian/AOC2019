@@ -6,12 +6,15 @@ import java.io.File
 fun main() {
     val program = readInput("src/day5/input.txt")
     val computer = IntCodeComputer(program)
-    computer.run(intArrayOf(1))
+
+    computer.addInput(1)
+    computer.run()
     println("outputs for part 1 is ${computer.outputs}")
 
     computer.reset()
 
-    computer.run(intArrayOf(5))
+    computer.addInput(5)
+    computer.run()
     println("outputs for part 2 is ${computer.outputs}")
 }
 

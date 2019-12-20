@@ -62,7 +62,8 @@ internal class IntCodeComputerTest {
     fun inputs() {
         val computer = IntCodeComputer(intArrayOf(3, 2, 0))
 
-        computer.run(intArrayOf(99))
+        computer.addInput(99)
+        computer.run()
 
         assertArrayEquals(intArrayOf(3, 2, 99), computer.memory)
     }
@@ -80,28 +81,45 @@ internal class IntCodeComputerTest {
     }
 
     @Test
+    fun outputFunction() {
+        val outputs = mutableListOf<Int>()
+        val computer = IntCodeComputer(intArrayOf(4, 2, 104, 66, 99))
+        computer.outputFunction = { x: Int -> outputs.add(x) }
+
+        computer.run()
+
+        assertEquals(2, outputs.size)
+        assertEquals(104, outputs[0])
+        assertEquals(66, outputs[1])
+    }
+
+    @Test
     fun day5Complex1() {
         val computer = IntCodeComputer(intArrayOf(3, 9, 8, 9, 10, 9, 4, 9, 99, -1, 8))
 
-        computer.run(intArrayOf(3))
+        computer.addInput(3)
+        computer.run()
         assertEquals(0, computer.outputs[0])
 
         computer.reset()
 
-        computer.run(intArrayOf(3))
-        assertEquals(0, computer.outputs[0])
+        computer.addInput(8)
+        computer.run()
+        assertEquals(1, computer.outputs[0])
     }
 
     @Test
     fun day5Complex2() {
         val computer = IntCodeComputer(intArrayOf(3, 9, 7, 9, 10, 9, 4, 9, 99, -1, 8))
 
-        computer.run(intArrayOf(10))
+        computer.addInput(10)
+        computer.run()
         assertEquals(0, computer.outputs[0])
 
         computer.reset()
 
-        computer.run(intArrayOf(3))
+        computer.addInput(3)
+        computer.run()
         assertEquals(1, computer.outputs[0])
     }
 
@@ -109,12 +127,14 @@ internal class IntCodeComputerTest {
     fun day5Complex3() {
         val computer = IntCodeComputer(intArrayOf(3, 3, 1108, -1, 8, 3, 4, 3, 99))
 
-        computer.run(intArrayOf(8))
+        computer.addInput(8)
+        computer.run()
         assertEquals(1, computer.outputs[0])
 
         computer.reset()
 
-        computer.run(intArrayOf(4))
+        computer.addInput(4)
+        computer.run()
         assertEquals(0, computer.outputs[0])
     }
 
@@ -122,12 +142,14 @@ internal class IntCodeComputerTest {
     fun day5Complex4() {
         val computer = IntCodeComputer(intArrayOf(3, 3, 1107, -1, 8, 3, 4, 3, 99))
 
-        computer.run(intArrayOf(10))
+        computer.addInput(10)
+        computer.run()
         assertEquals(0, computer.outputs[0])
 
         computer.reset()
 
-        computer.run(intArrayOf(4))
+        computer.addInput(4)
+        computer.run()
         assertEquals(1, computer.outputs[0])
     }
 
@@ -135,17 +157,20 @@ internal class IntCodeComputerTest {
     fun day5Complex5() {
         val computer = IntCodeComputer(intArrayOf(3, 12, 6, 12, 15, 1, 13, 14, 13, 4, 13, 99, -1, 0, 1, 9))
 
-        computer.run(intArrayOf(0))
+        computer.addInput(0)
+        computer.run()
         assertEquals(0, computer.outputs[0])
 
         computer.reset()
 
-        computer.run(intArrayOf(10))
+        computer.addInput(10)
+        computer.run()
         assertEquals(1, computer.outputs[0])
 
         computer.reset()
 
-        computer.run(intArrayOf(2))
+        computer.addInput(2)
+        computer.run()
         assertEquals(1, computer.outputs[0])
     }
 
@@ -153,17 +178,20 @@ internal class IntCodeComputerTest {
     fun day5Complex6() {
         val computer = IntCodeComputer(intArrayOf(3, 3, 1105, -1, 9, 1101, 0, 0, 12, 4, 12, 99, 1))
 
-        computer.run(intArrayOf(0))
+        computer.addInput(0)
+        computer.run()
         assertEquals(0, computer.outputs[0])
 
         computer.reset()
 
-        computer.run(intArrayOf(10))
+        computer.addInput(10)
+        computer.run()
         assertEquals(1, computer.outputs[0])
 
         computer.reset()
 
-        computer.run(intArrayOf(2))
+        computer.addInput(2)
+        computer.run()
         assertEquals(1, computer.outputs[0])
     }
 
@@ -177,17 +205,20 @@ internal class IntCodeComputerTest {
             )
         )
 
-        computer.run(intArrayOf(4))
+        computer.addInput(4)
+        computer.run()
         assertEquals(999, computer.outputs[0])
 
         computer.reset()
 
-        computer.run(intArrayOf(8))
+        computer.addInput(8)
+        computer.run()
         assertEquals(1000, computer.outputs[0])
 
         computer.reset()
 
-        computer.run(intArrayOf(10))
+        computer.addInput(10)
+        computer.run()
         assertEquals(1001, computer.outputs[0])
     }
 }
