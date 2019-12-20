@@ -78,7 +78,7 @@ class IntCodeComputer(private val program: IntCodeProgram) {
         var input = 0
         runBlocking {
             while(inputs.size == 0) {
-                delay(100)
+                delay(10)
             }
             input = inputs.first()
             inputs.removeAt(0)
