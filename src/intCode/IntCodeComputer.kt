@@ -1,8 +1,5 @@
 package intCode
 
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.runBlocking
-
 typealias IntCodeProgram = IntArray
 typealias ParameterMode = Int
 
@@ -13,14 +10,14 @@ const val IMMEDIATE = 1
 class IntCodeComputer(private val program: IntCodeProgram) {
     var memory = program.clone()
     var instructionPointer = 0
-    private var inputs = mutableListOf<Int>()
+    private var inputWaiter = InputWaiter()
     var outputs = mutableListOf<Int>()
     var outputFunction: (output: Int) -> Unit = {}
 
     fun reset() {
         instructionPointer = 0
         memory = program.clone()
-        inputs = mutableListOf()
+        inputWaiter = InputWaiter()
         outputs = mutableListOf()
     }
 
@@ -32,8 +29,8 @@ class IntCodeComputer(private val program: IntCodeProgram) {
     private fun treatInstruction() {
         val opcode = memory[instructionPointer] % 100
 
-        for(instruction in instructions) {
-            if(instruction.matches(opcode)) {
+        for (instruction in instructions) {
+            if (instruction.matches(opcode)) {
                 instruction.run(this)
                 return
             }
@@ -67,22 +64,10 @@ class IntCodeComputer(private val program: IntCodeProgram) {
     }
 
     fun addInput(x: Int) {
-        inputs.add(x)
-    }
-
-    fun addInputs(x: MutableList<Int>) {
-        inputs.addAll(x)
+        inputWaiter.addInput(x)
     }
 
     fun waitForNextInput(): Int {
-        var input = 0
-        runBlocking {
-            while(inputs.size == 0) {
-                delay(10)
-            }
-            input = inputs.first()
-            inputs.removeAt(0)
-        }
-        return input
+        return inputWaiter.waitForNextInput()
     }
 }
