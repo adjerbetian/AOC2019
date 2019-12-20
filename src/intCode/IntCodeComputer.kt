@@ -6,17 +6,19 @@ typealias ParameterMode = Int
 const val END = 99
 const val POSITION = 0
 const val IMMEDIATE = 1
+const val RELATIVE = 2
 
 class IntCodeComputer(private val program: IntCodeProgram) {
-    var memory = program.clone()
+    var memory = Memory(program)
     var instructionPointer = 0
     private var inputWaiter = InputWaiter()
     var outputs = mutableListOf<Int>()
     var outputFunction: (output: Int) -> Unit = {}
+    var relativeBase = 0
 
     fun reset() {
         instructionPointer = 0
-        memory = program.clone()
+        memory = Memory(program)
         inputWaiter = InputWaiter()
         outputs = mutableListOf()
     }
@@ -51,6 +53,8 @@ class IntCodeComputer(private val program: IntCodeProgram) {
             return memory[parameter]
         if (mode == IMMEDIATE)
             return parameter
+        if (mode == RELATIVE)
+            return memory[parameter + relativeBase]
 
         throw Error("unknown mode $mode")
     }
@@ -69,5 +73,37 @@ class IntCodeComputer(private val program: IntCodeProgram) {
 
     fun waitForNextInput(): Int {
         return inputWaiter.waitForNextInput()
+    }
+
+    fun getState(): IntArray {
+        return memory.getState()
+    }
+}
+
+class Memory(initialValue: IntCodeProgram) {
+    private var state = initialValue.clone()
+
+    operator fun get(i: Int): Int {
+        stretchMemory(i)
+        return state[i]
+    }
+
+    operator fun set(i: Int, value: Int) {
+        stretchMemory(i)
+        state[i] = value
+    }
+
+    private fun stretchMemory(i: Int) {
+        if(state.size <= i) {
+            state += IntArray(i - state.size + 1)
+        }
+    }
+
+    fun getState(): IntArray {
+        return state
+    }
+
+    override fun toString(): String {
+        return state.toList().toString()
     }
 }

@@ -10,7 +10,7 @@ internal class IntCodeComputerTest {
 
         computer.run()
 
-        assertArrayEquals(intArrayOf(2, 0, 0, 0, 99), computer.memory)
+        assertArrayEquals(intArrayOf(2, 0, 0, 0, 99), computer.getState())
     }
 
     @Test
@@ -19,7 +19,7 @@ internal class IntCodeComputerTest {
 
         computer.run()
 
-        assertArrayEquals(intArrayOf(2, 3, 0, 6, 99), computer.memory)
+        assertArrayEquals(intArrayOf(2, 3, 0, 6, 99), computer.getState())
     }
 
     @Test
@@ -28,7 +28,7 @@ internal class IntCodeComputerTest {
 
         computer.run()
 
-        assertArrayEquals(intArrayOf(2, 4, 4, 5, 99, 9801), computer.memory)
+        assertArrayEquals(intArrayOf(2, 4, 4, 5, 99, 9801), computer.getState())
     }
 
     @Test
@@ -37,7 +37,7 @@ internal class IntCodeComputerTest {
 
         computer.run()
 
-        assertArrayEquals(intArrayOf(30, 1, 1, 4, 2, 5, 6, 0, 99), computer.memory)
+        assertArrayEquals(intArrayOf(30, 1, 1, 4, 2, 5, 6, 0, 99), computer.getState())
     }
 
     @Test
@@ -46,7 +46,7 @@ internal class IntCodeComputerTest {
 
         computer.run()
 
-        assertArrayEquals(intArrayOf(1002, 4, 3, 4, 99), computer.memory)
+        assertArrayEquals(intArrayOf(1002, 4, 3, 4, 99), computer.getState())
     }
 
     @Test
@@ -55,7 +55,7 @@ internal class IntCodeComputerTest {
 
         computer.run()
 
-        assertArrayEquals(intArrayOf(1001, 4, 66, 4, 99), computer.memory)
+        assertArrayEquals(intArrayOf(1001, 4, 66, 4, 99), computer.getState())
     }
 
     @Test
@@ -65,7 +65,7 @@ internal class IntCodeComputerTest {
         computer.addInput(99)
         computer.run()
 
-        assertArrayEquals(intArrayOf(3, 2, 99), computer.memory)
+        assertArrayEquals(intArrayOf(3, 2, 99), computer.getState())
     }
 
     @Test
@@ -74,7 +74,7 @@ internal class IntCodeComputerTest {
 
         computer.run()
 
-        assertArrayEquals(intArrayOf(4, 2, 104, 66, 99), computer.memory)
+        assertArrayEquals(intArrayOf(4, 2, 104, 66, 99), computer.getState())
         assertEquals(2, computer.outputs.size)
         assertEquals(104, computer.outputs[0])
         assertEquals(66, computer.outputs[1])
@@ -221,4 +221,36 @@ internal class IntCodeComputerTest {
         computer.run()
         assertEquals(1001, computer.outputs[0])
     }
+
+    @Test
+    fun day9Simple1() {
+        val program = intArrayOf(109, 1, 204, -1, 1001, 100, 1, 100, 1008, 100, 16, 101, 1006, 101, 0, 99)
+        val computer = IntCodeComputer(program)
+
+        computer.run()
+
+        assertArrayEquals(program, computer.outputs.toIntArray())
+    }
+
+//    @Test
+//    fun day9Simple2() {
+//        val computer = IntCodeComputer(
+//            intArrayOf(1102, 34915192, 34915192, 7, 4, 7, 99, 0)
+//        )
+//
+//        computer.run()
+//
+//        assertEquals(16, computer.outputs.first().toString().length)
+//    }
+//
+//    @Test
+//    fun day9Simple3() {
+//        val computer = IntCodeComputer(
+//            longArrayOf(104, 1125899906842624, 99)
+//        )
+//
+//        computer.run()
+//
+//        assertEquals(1125899906842624, computer.outputs.first())
+//    }
 }
