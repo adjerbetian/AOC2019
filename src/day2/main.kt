@@ -1,10 +1,10 @@
 package day2
 
 import intCode.IntCodeComputer
-import java.io.File
+import intCode.readIntCodeProgram
 
 fun main() {
-    val program = readInput("src/day2/input.txt")
+    val program = readIntCodeProgram("src/day2/input.txt")
 
     val computer = IntCodeComputer(program)
     computer.memory[1] = 12
@@ -15,8 +15,6 @@ fun main() {
     val (noun, verb) = findNounAndVerbFor(computer, 19690720)
     println("Second result: ${100 * noun + verb}")
 }
-
-fun readInput(path: String) = File(path).readText(Charsets.UTF_8).split(",").map { it.toInt() }.toIntArray()
 
 fun findNounAndVerbFor(computer: IntCodeComputer, expectedResult: Int): NounVerb {
     for (noun in 0..99) {
