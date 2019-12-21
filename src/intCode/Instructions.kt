@@ -71,7 +71,7 @@ class JumpIfTrue : Instruction {
     override fun matches(opcode: Int) = opcode == 5
 
     override fun run(computer: IntCodeComputer) {
-        if (computer.getParamValue(1) != 0) {
+        if (computer.getParamValue(1) != 0L) {
             val jump = computer.getParamValue(2)
             computer.instructionPointer = jump
         } else
@@ -83,7 +83,7 @@ class JumpIfFalse : Instruction {
     override fun matches(opcode: Int) = opcode == 6
 
     override fun run(computer: IntCodeComputer) {
-        if (computer.getParamValue(1) == 0) {
+        if (computer.getParamValue(1) == 0L) {
             val jump = computer.getParamValue(2)
             computer.instructionPointer = jump
         } else

@@ -1,5 +1,6 @@
 package day2
 
+import intCode.IntCode
 import intCode.IntCodeComputer
 import intCode.readIntCodeProgram
 
@@ -16,9 +17,9 @@ fun main() {
     println("Second result: ${100 * noun + verb}")
 }
 
-fun findNounAndVerbFor(computer: IntCodeComputer, expectedResult: Int): NounVerb {
-    for (noun in 0..99) {
-        for (verb in 0..99) {
+fun findNounAndVerbFor(computer: IntCodeComputer, expectedResult: IntCode): NounVerb {
+    for (noun in 0..99L) {
+        for (verb in 0..99L) {
             computer.reset()
             computer.memory[1] = noun
             computer.memory[2] = verb
@@ -30,5 +31,5 @@ fun findNounAndVerbFor(computer: IntCodeComputer, expectedResult: Int): NounVerb
     throw Error("Not found")
 }
 
-data class NounVerb(val noun: Int, val verb: Int)
+data class NounVerb(val noun: IntCode, val verb: IntCode)
 

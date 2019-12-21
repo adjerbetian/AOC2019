@@ -1,20 +1,20 @@
 package intCode
 
-typealias IntCodeProgram = IntArray
-typealias ParameterMode = Int
+typealias IntCodeProgram = LongArray
+typealias IntCode = Long
 
-const val END = 99
+const val END = 99L
 const val POSITION = 0
 const val IMMEDIATE = 1
 const val RELATIVE = 2
 
 class IntCodeComputer(private val program: IntCodeProgram) {
     var memory = Memory(program)
-    var instructionPointer = 0
+    var instructionPointer = 0L
     private var inputWaiter = InputWaiter()
-    var outputs = mutableListOf<Int>()
-    var outputFunction: (output: Int) -> Unit = {}
-    var relativeBase = 0
+    var outputs = mutableListOf<Long>()
+    var outputFunction: (output: Long) -> Unit = {}
+    var relativeBase = 0L
 
     fun reset() {
         instructionPointer = 0
@@ -29,7 +29,7 @@ class IntCodeComputer(private val program: IntCodeProgram) {
     }
 
     private fun treatInstruction() {
-        val opcode = memory[instructionPointer] % 100
+        val opcode = (memory[instructionPointer] % 100).toInt()
 
         for (instruction in instructions) {
             if (instruction.matches(opcode)) {
@@ -41,11 +41,7 @@ class IntCodeComputer(private val program: IntCodeProgram) {
         throw Error("unknown opcode $opcode")
     }
 
-    fun getParam(index: Int): Int {
-        return memory[instructionPointer + index]
-    }
-
-    fun getParamValue(index: Int): Int {
+    fun getParamValue(index: Int): IntCode {
         val mode = getParamMode(index)
         val parameter = getParam(index)
 
@@ -59,51 +55,28 @@ class IntCodeComputer(private val program: IntCodeProgram) {
         throw Error("unknown mode $mode")
     }
 
-    private fun getParamMode(index: Int): ParameterMode {
+    fun getParam(index: Int): IntCode {
+        return memory[instructionPointer + index]
+    }
+
+    private fun getParamMode(index: Int): Int {
         val instruction = memory[instructionPointer]
         var mode = instruction / 100
         for (i in 1 until index)
             mode /= 10
-        return mode % 10
+        return (mode % 10).toInt()
     }
 
-    fun addInput(x: Int) {
+    fun addInput(x: IntCode) {
         inputWaiter.addInput(x)
     }
 
-    fun waitForNextInput(): Int {
+    fun waitForNextInput(): IntCode {
         return inputWaiter.waitForNextInput()
     }
 
-    fun getState(): IntArray {
+    fun getState(): IntCodeProgram {
         return memory.getState()
     }
 }
 
-class Memory(initialValue: IntCodeProgram) {
-    private var state = initialValue.clone()
-
-    operator fun get(i: Int): Int {
-        stretchMemory(i)
-        return state[i]
-    }
-
-    operator fun set(i: Int, value: Int) {
-        stretchMemory(i)
-        state[i] = value
-    }
-
-    private fun stretchMemory(i: Int) {
-        if(state.size <= i) {
-            state += IntArray(i - state.size + 1)
-        }
-    }
-
-    fun getState(): IntArray {
-        return state
-    }
-
-    override fun toString(): String {
-        return state.toList().toString()
-    }
-}

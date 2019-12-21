@@ -1,5 +1,6 @@
 package day7
 
+import intCode.IntCode
 import intCode.IntCodeComputer
 import intCode.IntCodeProgram
 import kotlinx.coroutines.GlobalScope
@@ -9,7 +10,7 @@ import kotlinx.coroutines.runBlocking
 class AmplificationCircuit(program: IntCodeProgram, phases: List<Int>) {
     private val amplifiers = phases.map { phase ->
         val amplifier = IntCodeComputer(program)
-        amplifier.addInput(phase)
+        amplifier.addInput(phase.toLong())
         amplifier
     }
 
@@ -33,7 +34,7 @@ class AmplificationCircuit(program: IntCodeProgram, phases: List<Int>) {
         }
     }
 
-    fun getOutput(): Int {
+    fun getOutput(): IntCode {
         return amplifiers.last().outputs.last()
     }
 }

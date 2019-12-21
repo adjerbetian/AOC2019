@@ -1,8 +1,9 @@
 package day7
 
+import intCode.IntCode
 import intCode.IntCodeProgram
 import intCode.readIntCodeProgram
-import java.lang.Integer.max
+import java.lang.Long.max
 
 fun main() {
     val program = readIntCodeProgram("src/day7/input.txt")
@@ -14,8 +15,8 @@ fun main() {
     println("Part 2: Max thruster signal is $part2")
 }
 
-fun findMaxThrustForPhases(program: IntCodeProgram, phases: List<Int>): Int {
-    var maxOutput: Int = Int.MIN_VALUE
+fun findMaxThrustForPhases(program: IntCodeProgram, phases: List<Int>): IntCode {
+    var maxOutput = Long.MIN_VALUE
     val permutations = permutations(phases)
 
     for (phase in permutations) {

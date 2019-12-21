@@ -6,7 +6,7 @@ import kotlinx.coroutines.yield
 import kotlin.random.Random
 
 class Counter {
-    private var i = 0;
+    private var i = 0
 
     fun get() = i++
 
@@ -16,14 +16,14 @@ class Counter {
 val counter = Counter()
 
 class InputWaiter(val name: String = counter.getAsText()) {
-    private val inputs = mutableListOf<Int>()
+    private val inputs = mutableListOf<IntCode>()
     private var isWaiting = false
 
-    fun addInput(x: Int) {
+    fun addInput(x: IntCode) {
         inputs.add(x)
     }
 
-    fun waitForNextInput(): Int {
+    fun waitForNextInput(): IntCode {
         setWaiting(true)
         return runBlocking {
             while (inputs.isEmpty()) {
@@ -36,7 +36,7 @@ class InputWaiter(val name: String = counter.getAsText()) {
         }
     }
 
-    private fun popInput(): Int {
+    private fun popInput(): IntCode {
         val input = inputs.first()
         inputs.removeAt(0)
         return input
