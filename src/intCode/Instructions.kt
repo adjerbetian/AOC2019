@@ -12,52 +12,45 @@ val instructions: Array<Instruction> = arrayOf(
     AdjustRelativeBase()
 )
 
-interface Instruction {
-    fun matches(opcode: Int): Boolean
-    fun run(computer: IntCodeComputer)
+abstract class Instruction(private val opcode: Int) {
+    fun matches(code: Int) = opcode == code
+
+    abstract fun run(computer: IntCodeComputer)
 }
 
-class Add : Instruction {
-    override fun matches(opcode: Int) = opcode == 1
-
+class Add() : Instruction(1) {
     override fun run(computer: IntCodeComputer) {
         val a = computer.getParamValue(1)
         val b = computer.getParamValue(2)
-        val to = computer.getParam(3)
+        val to = computer.getParamDest(3)
         computer.memory[to] = a + b
 
         computer.instructionPointer += 4
     }
 }
 
-class Multiply : Instruction {
-    override fun matches(opcode: Int) = opcode == 2
-
+class Multiply : Instruction(2) {
     override fun run(computer: IntCodeComputer) {
         val a = computer.getParamValue(1)
         val b = computer.getParamValue(2)
-        val to = computer.getParam(3)
+        val to = computer.getParamDest(3)
         computer.memory[to] = a * b
 
         computer.instructionPointer += 4
     }
 }
 
-class Input : Instruction {
-    override fun matches(opcode: Int) = opcode == 3
-
+class Input : Instruction(3) {
     override fun run(computer: IntCodeComputer) {
         val input = computer.waitForNextInput()
-        val to = computer.getParam(1)
+        val to = computer.getParamDest(1)
         computer.memory[to] = input
 
         computer.instructionPointer += 2
     }
 }
 
-class Output : Instruction {
-    override fun matches(opcode: Int) = opcode == 4
-
+class Output : Instruction(4) {
     override fun run(computer: IntCodeComputer) {
         val output = computer.getParamValue(1)
         computer.outputs.add(output)
@@ -67,9 +60,7 @@ class Output : Instruction {
     }
 }
 
-class JumpIfTrue : Instruction {
-    override fun matches(opcode: Int) = opcode == 5
-
+class JumpIfTrue : Instruction(5) {
     override fun run(computer: IntCodeComputer) {
         if (computer.getParamValue(1) != 0L) {
             val jump = computer.getParamValue(2)
@@ -79,9 +70,7 @@ class JumpIfTrue : Instruction {
     }
 }
 
-class JumpIfFalse : Instruction {
-    override fun matches(opcode: Int) = opcode == 6
-
+class JumpIfFalse : Instruction(6) {
     override fun run(computer: IntCodeComputer) {
         if (computer.getParamValue(1) == 0L) {
             val jump = computer.getParamValue(2)
@@ -91,35 +80,29 @@ class JumpIfFalse : Instruction {
     }
 }
 
-class LessThan : Instruction {
-    override fun matches(opcode: Int) = opcode == 7
-
+class LessThan : Instruction(7) {
     override fun run(computer: IntCodeComputer) {
         val a = computer.getParamValue(1)
         val b = computer.getParamValue(2)
-        val to = computer.getParam(3)
+        val to = computer.getParamDest(3)
         computer.memory[to] = if (a < b) 1 else 0
 
         computer.instructionPointer += 4
     }
 }
 
-class Equals : Instruction {
-    override fun matches(opcode: Int) = opcode == 8
-
+class Equals : Instruction(8) {
     override fun run(computer: IntCodeComputer) {
         val a = computer.getParamValue(1)
         val b = computer.getParamValue(2)
-        val to = computer.getParam(3)
+        val to = computer.getParamDest(3)
         computer.memory[to] = if (a == b) 1 else 0
 
         computer.instructionPointer += 4
     }
 }
 
-class AdjustRelativeBase : Instruction {
-    override fun matches(opcode: Int) = opcode == 9
-
+class AdjustRelativeBase : Instruction(9) {
     override fun run(computer: IntCodeComputer) {
         computer.relativeBase += computer.getParamValue(1)
         computer.instructionPointer += 2

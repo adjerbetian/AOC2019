@@ -10,8 +10,9 @@ const val RELATIVE = 2
 
 class IntCodeComputer(private val program: IntCodeProgram) {
     var memory = Memory(program)
-    var instructionPointer = 0L
     private var inputWaiter = InputWaiter()
+
+    var instructionPointer = 0L
     var outputs = mutableListOf<Long>()
     var outputFunction: (output: Long) -> Unit = {}
     var relativeBase = 0L
@@ -55,16 +56,30 @@ class IntCodeComputer(private val program: IntCodeProgram) {
         throw Error("unknown mode $mode")
     }
 
-    fun getParam(index: Int): IntCode {
+    fun getParamDest(index: Int): IntCode {
+        val mode = getParamMode(index)
+        val parameter = getParam(index)
+
+        if (mode == POSITION)
+            return parameter
+        if (mode == IMMEDIATE)
+            return parameter
+        if (mode == RELATIVE)
+            return parameter + relativeBase
+
+        throw Error("unknown mode $mode")
+    }
+
+    private fun getParam(index: Int): IntCode {
         return memory[instructionPointer + index]
     }
 
     private fun getParamMode(index: Int): Int {
-        val instruction = memory[instructionPointer]
+        val instruction = memory[instructionPointer].toInt()
         var mode = instruction / 100
         for (i in 1 until index)
             mode /= 10
-        return (mode % 10).toInt()
+        return mode % 10
     }
 
     fun addInput(x: IntCode) {
