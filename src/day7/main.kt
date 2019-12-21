@@ -23,7 +23,6 @@ fun findMaxThrustForPhases(program: IntCodeProgram, phases: List<Int>): IntCode 
         val circuit = AmplificationCircuit(program, phase)
         circuit.run()
         maxOutput = max(maxOutput, circuit.getOutput())
-        println("\t$phase --> thrust = ${circuit.getOutput()} --> max = $maxOutput")
     }
 
     return maxOutput

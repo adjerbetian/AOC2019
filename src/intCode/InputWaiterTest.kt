@@ -12,7 +12,7 @@ import org.junit.jupiter.api.Disabled
 internal class InputWaiterTest {
     @Test
     fun simple1() = runBlocking {
-        val waiter = InputWaiter("waiter")
+        val waiter = InputWaiter()
 
         waiter.addInput(2)
 
@@ -21,7 +21,7 @@ internal class InputWaiterTest {
 
     @Test
     fun simple2() = runBlocking {
-        val waiter = InputWaiter("waiter")
+        val waiter = InputWaiter()
 
         waiter.addInput(1)
         waiter.addInput(2)
@@ -34,7 +34,7 @@ internal class InputWaiterTest {
 
     @Test
     fun complex() = runBlocking {
-        val waiter = InputWaiter("waiter")
+        val waiter = InputWaiter()
 
         GlobalScope.launch {
             delay(10)
@@ -49,7 +49,6 @@ internal class InputWaiterTest {
         assertEquals(3, waiter.waitForNextInput())
     }
 
-    @Disabled
     @Test
     fun complexMultiple() = runBlocking {
         val waiters = List(20) { InputWaiter() }
@@ -60,8 +59,26 @@ internal class InputWaiterTest {
                     it.waitForNextInput()
                 },
                 GlobalScope.launch {
-                    delay(2)
                     it.addInput(2)
+                }
+            )
+        }
+
+        promises.forEach { list -> list.forEach { it.join() } }
+    }
+
+    @Disabled
+    @Test
+    fun complexMultipleWithDelay() = runBlocking {
+        val waiters = List(20) { InputWaiter() }
+
+        val promises = waiters.map {
+            listOf(
+                GlobalScope.launch {
+                    it.waitForNextInput()
+                },
+                GlobalScope.launch {
+                    delay(2)
                 }
             )
         }
