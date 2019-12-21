@@ -22,6 +22,7 @@ class IntCodeComputer(private val program: IntCodeProgram) {
         memory = Memory(program)
         inputWaiter = InputWaiter()
         outputs = mutableListOf()
+        relativeBase = 0L
     }
 
     fun run() {
