@@ -1,13 +1,11 @@
 package intCode
 
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.*
 import org.junit.jupiter.api.Test
 
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Disabled
+import kotlin.test.assertTrue
 
 internal class InputWaiterTest {
     @Test
@@ -16,7 +14,7 @@ internal class InputWaiterTest {
 
         waiter.addInput(2)
 
-        assertEquals(2, waiter.waitForNextInput())
+        assertEquals(2, waiter.takeInput())
     }
 
     @Test
@@ -27,9 +25,9 @@ internal class InputWaiterTest {
         waiter.addInput(2)
         waiter.addInput(3)
 
-        assertEquals(1, waiter.waitForNextInput())
-        assertEquals(2, waiter.waitForNextInput())
-        assertEquals(3, waiter.waitForNextInput())
+        assertEquals(1, waiter.takeInput())
+        assertEquals(2, waiter.takeInput())
+        assertEquals(3, waiter.takeInput())
     }
 
     @Test
@@ -44,45 +42,62 @@ internal class InputWaiterTest {
             waiter.addInput(3)
         }
 
-        assertEquals(1, waiter.waitForNextInput())
-        assertEquals(2, waiter.waitForNextInput())
-        assertEquals(3, waiter.waitForNextInput())
+        assertEquals(1, waiter.takeInput())
+        assertEquals(2, waiter.takeInput())
+        assertEquals(3, waiter.takeInput())
     }
 
     @Test
-    fun complexMultiple() = runBlocking {
+    fun complexMultiple() {
         val waiters = List(20) { InputWaiter() }
+        val promises = mutableListOf<Deferred<IntCode>>()
 
-        val promises = waiters.map {
-            listOf(
-                GlobalScope.launch {
-                    it.waitForNextInput()
-                },
-                GlobalScope.launch {
-                    it.addInput(2)
+        waiters.forEach { waiter ->
+            promises.add(
+                GlobalScope.async {
+                    waiter.takeInput()
+                }
+            )
+            promises.add(
+                GlobalScope.async {
+                    waiter.addInput(2)
+                    2L
                 }
             )
         }
 
-        promises.forEach { list -> list.forEach { it.join() } }
+        val results = runBlocking {
+            promises.awaitAll()
+        }
+        assertEquals(waiters.size * 2, results.size)
+        assertTrue(results.all { it == 2L })
     }
 
     @Disabled
     @Test
-    fun complexMultipleWithDelay() = runBlocking {
+    fun complexMultipleWithDelay() {
         val waiters = List(20) { InputWaiter() }
+        val promises = mutableListOf<Deferred<IntCode>>()
 
-        val promises = waiters.map {
-            listOf(
-                GlobalScope.launch {
-                    it.waitForNextInput()
-                },
-                GlobalScope.launch {
-                    delay(2)
+        waiters.forEach { waiter ->
+            promises.add(
+                GlobalScope.async {
+                    waiter.takeInput()
+                }
+            )
+            promises.add(
+                GlobalScope.async {
+                    delay(10L)
+                    waiter.addInput(2)
+                    2L
                 }
             )
         }
 
-        promises.forEach { list -> list.forEach { it.join() } }
+        val results = runBlocking {
+            promises.awaitAll()
+        }
+        assertEquals(waiters.size * 2, results.size)
+        assertTrue(results.all { it == 2L })
     }
 }

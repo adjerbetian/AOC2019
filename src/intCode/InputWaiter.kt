@@ -1,30 +1,15 @@
 package intCode
 
-import kotlinx.coroutines.*
+import java.util.concurrent.LinkedBlockingDeque
 
-val context = newSingleThreadContext("InputWaiterContext")
-
-class InputWaiter() {
-    private val inputs = mutableListOf<IntCode>()
+class InputWaiter {
+    private val inputs = LinkedBlockingDeque<IntCode>()
 
     fun addInput(x: IntCode) {
         inputs.add(x)
     }
 
-    fun waitForNextInput(): IntCode {
-        return runBlocking {
-            withContext(context) {
-                while (inputs.isEmpty())
-                    yield()
-
-                popInput()
-            }
-        }
-    }
-
-    private fun popInput(): IntCode {
-        val input = inputs.first()
-        inputs.removeAt(0)
-        return input
+    fun takeInput(): IntCode {
+        return inputs.take()
     }
 }

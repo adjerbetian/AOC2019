@@ -88,7 +88,7 @@ class IntCodeComputer(private val program: IntCodeProgram) {
     }
 
     fun waitForNextInput(): IntCode {
-        return inputWaiter.waitForNextInput()
+        return inputWaiter.takeInput()
     }
 
     fun getState(): IntCodeProgram {
