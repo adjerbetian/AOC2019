@@ -7,10 +7,10 @@ data class Point(val x: Int, val y: Int) {
 
         val testingVector = to - from
         val blockingVector = this - from
-        if (testingVector.vectorial(blockingVector) != 0) return false
-        if (testingVector.dot(blockingVector) < 0) return false
+        if (!testingVector.isAlignedWith(blockingVector)) return false
         return blockingVector.norm1() < testingVector.norm1()
     }
 
-    private operator fun minus(p: Point) = Vector(x - p.x, y - p.y)
+    operator fun minus(p: Point) = Vector(x - p.x, y - p.y)
+    operator fun plus(v: Vector) = Point(x - v.x, y + v.y)
 }

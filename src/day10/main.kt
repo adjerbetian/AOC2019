@@ -8,6 +8,9 @@ fun main() {
     val bestLocation = map.bestMonitoringStation()
     val result = map.getNumberDetectableAsteroidsFrom(bestLocation)
     println("Best location is $result")
+
+    repeat(199) { map.vaporize() }
+    println("200th vaporized is ${map.vaporize()}")
 }
 
 fun readInput(stringPath: String): String {
