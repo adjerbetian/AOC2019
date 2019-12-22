@@ -9,14 +9,14 @@ internal class PaintingRobotTest {
     fun move() {
         val robot = PaintingRobot()
 
-        assertEquals(Position(0, 0), robot.position)
-        assertEquals(Up, robot.direction)
+        assertEquals(Position(0, 0), robot.currentPosition)
+        assertEquals(Up, robot.currentDirection)
 
         robot.moveForward()
-        assertEquals(Position(0, 1), robot.position)
+        assertEquals(Position(0, 1), robot.currentPosition)
 
         robot.moveForward()
-        assertEquals(Position(0, 2), robot.position)
+        assertEquals(Position(0, 2), robot.currentPosition)
     }
 
     @Test
@@ -24,28 +24,28 @@ internal class PaintingRobotTest {
         val robot = PaintingRobot()
 
         robot.turnRight()
-        assertEquals(Right, robot.direction)
+        assertEquals(Right, robot.currentDirection)
 
         robot.turnRight()
-        assertEquals(Down, robot.direction)
+        assertEquals(Down, robot.currentDirection)
 
         robot.turnRight()
-        assertEquals(Left, robot.direction)
+        assertEquals(Left, robot.currentDirection)
 
         robot.turnRight()
-        assertEquals(Up, robot.direction)
+        assertEquals(Up, robot.currentDirection)
 
         robot.turnLeft()
-        assertEquals(Left, robot.direction)
+        assertEquals(Left, robot.currentDirection)
 
         robot.turnLeft()
-        assertEquals(Down, robot.direction)
+        assertEquals(Down, robot.currentDirection)
 
         robot.turnLeft()
-        assertEquals(Right, robot.direction)
+        assertEquals(Right, robot.currentDirection)
 
         robot.turnLeft()
-        assertEquals(Up, robot.direction)
+        assertEquals(Up, robot.currentDirection)
     }
 
     @Test
@@ -55,13 +55,13 @@ internal class PaintingRobotTest {
         robot.moveForward()
         robot.turnRight()
         robot.moveForward()
-        assertEquals(Position(1, 1), robot.position)
+        assertEquals(Position(1, 1), robot.currentPosition)
 
         robot.moveForward()
         robot.moveForward()
         robot.turnLeft()
         robot.moveForward()
-        assertEquals(Position(3, 2), robot.position)
+        assertEquals(Position(3, 2), robot.currentPosition)
     }
 
     @Test
