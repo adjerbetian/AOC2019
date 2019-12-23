@@ -1,52 +1,8 @@
 package day12
 
-import kotlin.math.abs
+class JupiterSystem(private val initialPositions: List<Position>) {
+    private val moons = initialPositions.map { Moon(it) }
 
-data class Position(val x: Int, val y: Int, val z: Int) {
-    override fun toString() = "pos=<x=$x, y=$y, z=$z>"
-
-    operator fun plus(v: Velocity) = Position(x + v.x, y + v.y, z + v.z)
-
-    fun norm() = abs(x) + abs(y) + abs(z)
-}
-
-data class Velocity(var x: Int, var y: Int, var z: Int) {
-    override fun toString() = "vel=<x=$x, y=$y, z=$z>"
-
-    fun norm() = abs(x) + abs(y) + abs(z)
-}
-
-class Moon(var position: Position) {
-    private var velocity = Velocity(0, 0, 0)
-
-    override fun toString(): String {
-        return "$position, $velocity"
-    }
-
-    fun applyGravityOf(m: Moon) {
-        if (m.position.x > position.x) velocity.x++
-        if (m.position.x < position.x) velocity.x--
-
-        if (m.position.y > position.y) velocity.y++
-        if (m.position.y < position.y) velocity.y--
-
-        if (m.position.z > position.z) velocity.z++
-        if (m.position.z < position.z) velocity.z--
-    }
-
-    fun applyVelocity() {
-        position += velocity
-    }
-
-    fun getTotalEnergy() = getPotentialEnergy() * getKineticEnergy()
-
-    private fun getPotentialEnergy() = position.norm()
-
-    private fun getKineticEnergy() = velocity.norm()
-}
-
-
-class JupiterSystem(private val moons: List<Moon>) {
     override fun toString(): String {
         return moons.joinToString("\n")
     }
@@ -68,4 +24,27 @@ class JupiterSystem(private val moons: List<Moon>) {
     }
 
     fun getTotalEnergy() = moons.sumBy { it.getTotalEnergy() }
+
+    fun getNumberOfStepsToReachAPreviousPosition(): Long {
+        return bruteForceSolution()
+    }
+
+    private fun bruteForceSolution(): Long {
+        var steps = 0L
+        step()
+        steps++
+
+        while (true) {
+            if (
+                moons.map { it.position } == initialPositions &&
+                moons.all { it.velocity == Velocity(0, 0, 0) }
+            )
+                return steps
+
+            step()
+            steps++
+            if (steps % 10000000 == 0L)
+                println("$steps - ${steps.toFloat() / 4686774924 * 100}% of 4686774924")
+        }
+    }
 }

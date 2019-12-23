@@ -2,6 +2,7 @@ package day12
 
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 
 internal class JupiterSystemTest {
@@ -11,10 +12,10 @@ internal class JupiterSystemTest {
     fun setup() {
         system = JupiterSystem(
             listOf(
-                Moon(Position(-1, 0, 2)),
-                Moon(Position(2, -10, -7)),
-                Moon(Position(4, -8, 8)),
-                Moon(Position(3, 5, -1))
+                Position(-1, 0, 2),
+                Position(2, -10, -7),
+                Position(4, -8, 8),
+                Position(3, 5, -1)
             )
         )
     }
@@ -146,5 +147,25 @@ internal class JupiterSystemTest {
         repeat(10) { system.step() }
 
         assertEquals(179, system.getTotalEnergy())
+    }
+
+    @Test
+    fun stepsBeforeSamePosition() {
+        assertEquals(2772, system.getNumberOfStepsToReachAPreviousPosition())
+    }
+
+    @Disabled
+    @Test
+    fun stepsBeforeSamePositionComplex() {
+        system = JupiterSystem(
+            listOf(
+                Position(-8, -10, 0),
+                Position(5, 5, 10),
+                Position(2, -7, 3),
+                Position(9, -8, -3)
+            )
+        )
+
+        assertEquals(4686774924, system.getNumberOfStepsToReachAPreviousPosition())
     }
 }
