@@ -26,25 +26,52 @@ class JupiterSystem(private val initialPositions: List<Position>) {
     fun getTotalEnergy() = moons.sumBy { it.getTotalEnergy() }
 
     fun getNumberOfStepsToReachAPreviousPosition(): Long {
-        return bruteForceSolution()
-    }
+        var periodX: Int? = null
+        var periodY: Int? = null
+        var periodZ: Int? = null
 
-    private fun bruteForceSolution(): Long {
-        var steps = 0L
+        var steps = 0
         step()
         steps++
 
-        while (true) {
+        while (periodX == null || periodY == null || periodZ == null) {
             if (
-                moons.map { it.position } == initialPositions &&
-                moons.all { it.velocity == Velocity(0, 0, 0) }
+                periodX == null &&
+                moons.map { it.position.x } == initialPositions.map { it.x } &&
+                moons.all { it.velocity.x == 0 }
             )
-                return steps
+                periodX = steps
+
+            if (
+                periodY == null &&
+                moons.map { it.position.y } == initialPositions.map { it.y } &&
+                moons.all { it.velocity.y == 0 }
+            )
+                periodY = steps
+
+            if (
+                periodZ == null &&
+                moons.map { it.position.z } == initialPositions.map { it.z } &&
+                moons.all { it.velocity.z == 0 }
+            )
+                periodZ = steps
 
             step()
             steps++
-            if (steps % 10000000 == 0L)
-                println("$steps - ${steps.toFloat() / 4686774924 * 100}% of 4686774924")
         }
+        return lcm(lcm(periodX, periodY), periodZ)
     }
+}
+
+fun lcm(a: Int, b: Int) = lcm(a.toLong(), b.toLong())
+fun lcm(a: Long, b: Int) = lcm(a, b.toLong())
+fun lcm(a: Int, b: Long) = lcm(a.toLong(), b)
+
+fun lcm(a: Long, b: Long): Long {
+    if (a < b) return lcm(b, a)
+
+    var result = a
+    while (result % b != 0L)
+        result += a
+    return result
 }

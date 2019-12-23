@@ -154,7 +154,6 @@ internal class JupiterSystemTest {
         assertEquals(2772, system.getNumberOfStepsToReachAPreviousPosition())
     }
 
-    @Disabled
     @Test
     fun stepsBeforeSamePositionComplex() {
         system = JupiterSystem(
