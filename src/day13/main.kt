@@ -7,24 +7,26 @@ import intCode.readIntCodeProgram
 fun main() {
     val program = readIntCodeProgram("src/day13/input.txt")
     runPart1(program)
+    runPart2(program)
 }
 
 fun runPart1(program: IntCodeProgram) {
     val computer = IntCodeComputer(program)
-
-    var nBlockTiles = 0
-
-    var i = 0
-    val values = longArrayOf(0, 0, 0)
-    computer.outputFunction = { x ->
-        values[i++] = x
-        if (i == 3) {
-            if (values[2] == 2L) nBlockTiles++
-            i = 0
-        }
-    }
+    val game = Game()
+    game.linkToComputer(computer)
 
     computer.run()
 
-    println("There are $nBlockTiles block tiles")
+    println("Number of Block tiles: ${game.tiles.count { it is BlockTile }}")
+}
+
+fun runPart2(program: IntCodeProgram) {
+    val computer = IntCodeComputer(program)
+    val game = Game()
+    game.linkToComputer(computer, verbose = false)
+
+    computer.memory[0] = 2
+    computer.run()
+
+    println("The score is ${game.score}")
 }

@@ -15,6 +15,7 @@ class IntCodeComputer(private val program: IntCodeProgram) {
     var instructionPointer = 0L
     var outputs = mutableListOf<Long>()
     var outputFunction: (output: Long) -> Unit = {}
+    var onInput: () -> Unit = {}
     var relativeBase = 0L
 
     fun reset() {
@@ -88,6 +89,7 @@ class IntCodeComputer(private val program: IntCodeProgram) {
     }
 
     fun waitForNextInput(): IntCode {
+        onInput()
         return inputWaiter.takeInput()
     }
 
