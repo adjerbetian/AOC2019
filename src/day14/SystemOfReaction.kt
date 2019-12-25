@@ -19,8 +19,8 @@ data class Reaction(val output: Ingredient, val ingredients: List<Ingredient>) {
 
 
 class SystemOfReaction(systemString: String) {
-    private val reactions: List<Reaction> = SystemParser().parse(systemString)
-    private val stock = Stock(reactions)
+    private val reactions: Map<Chemical, Reaction> = SystemParser().parse(systemString)
+    private val stock = Stock(reactions.keys)
 
     fun computeMinOREFor(chemical: Chemical): Quantity {
         return computeMinOREFor(Ingredient(chemical, 1))
@@ -52,7 +52,7 @@ class SystemOfReaction(systemString: String) {
     }
 
     private fun findReactionFor(chemical: Chemical): Reaction {
-        return reactions.find { it.output.chemical == chemical }!!
+        return reactions[chemical] ?: error("No reaction for $chemical")
     }
 
     fun reset() {
@@ -80,7 +80,7 @@ class SystemOfReaction(systemString: String) {
         while (stock.isNotEmpty()) {
             ore += computeMinOREFor("FUEL")
             period++
-            if(period % 10000 == 0)
+            if (period % 10000 == 0)
                 println(period)
         }
         reset()
@@ -88,12 +88,12 @@ class SystemOfReaction(systemString: String) {
     }
 }
 
-class Stock(reactions: List<Reaction>) {
+class Stock(chemicals: Set<Chemical>) {
     private val stock: HashMap<Chemical, Quantity> = HashMap()
 
     init {
-        for (reaction in reactions)
-            stock[reaction.output.chemical] = 0
+        for (chemical in chemicals)
+            stock[chemical] = 0
     }
 
     operator fun get(chemical: Chemical): Quantity = stock[chemical]!!

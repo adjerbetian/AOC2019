@@ -1,8 +1,11 @@
 package day14
 
 class SystemParser {
-    fun parse(systemString: String): List<Reaction> {
-        return systemString.split("\n").map { parseReaction(it) }
+    fun parse(systemString: String): Map<Chemical, Reaction> {
+        val reactions = systemString.split("\n").map { parseReaction(it) }
+        val map = HashMap<Chemical, Reaction>(reactions.size)
+        reactions.forEach { map[it.output.chemical] = it }
+        return map
     }
 
     private fun parseReaction(line: String): Reaction {
