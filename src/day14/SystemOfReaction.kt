@@ -60,31 +60,26 @@ class SystemOfReaction(systemString: String) {
     }
 
     fun computeMaxFuelWith(ore: Quantity): Quantity {
-        val (period, orePerPeriod) = findPeriod()
+        var minFuel = 0L
+        var maxFuel = 1L
 
-        var fuel = (ore / orePerPeriod) * period
-        var oreLeft = ore % orePerPeriod
-        while (oreLeft > 0) {
-            oreLeft -= computeMinOREFor("FUEL")
-            if (oreLeft >= 0) {
-                fuel++
-            }
-        }
-        return fuel
-    }
-
-    private fun findPeriod(): Pair<Int, Quantity> {
-        reset()
-        var ore = computeMinOREFor("FUEL")
-        var period = 1
-        while (stock.isNotEmpty()) {
-            ore += computeMinOREFor("FUEL")
-            period++
-            if (period % 10000 == 0)
-                println(period)
+        while (computeMinOREFor(Ingredient("FUEL", maxFuel)) <= ore) {
+            maxFuel *= 2
+            reset()
         }
         reset()
-        return Pair(period, ore)
+
+        while (maxFuel - minFuel > 1) {
+            val fuel = (minFuel + maxFuel) / 2
+            val oreTemp = computeMinOREFor(Ingredient("FUEL", fuel))
+            reset()
+
+            if (oreTemp > ore)
+                maxFuel = fuel
+            else
+                minFuel = fuel
+        }
+        return minFuel
     }
 }
 
