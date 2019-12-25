@@ -53,6 +53,41 @@ internal class SystemOfReactionTest {
     }
 
     @Test
+    fun maxFuel1() {
+        val system = SystemOfReaction(
+            """
+                3 ORE => 1 FUEL
+            """.trimIndent()
+        )
+
+        assertEquals(1, system.computeMaxFuelWith(3))
+        system.reset()
+        assertEquals(1, system.computeMaxFuelWith(4))
+        system.reset()
+        assertEquals(1, system.computeMaxFuelWith(5))
+        system.reset()
+        assertEquals(2, system.computeMaxFuelWith(6))
+        system.reset()
+        assertEquals(1000, system.computeMaxFuelWith(3002))
+    }
+
+    @Test
+    fun maxFuel2() {
+        val system = SystemOfReaction(
+            """
+                3 ORE => 2 A
+                3 A => 1 FUEL
+            """.trimIndent()
+        )
+
+        assertEquals(0, system.computeMaxFuelWith(3))
+        system.reset()
+        assertEquals(1, system.computeMaxFuelWith(6))
+        system.reset()
+        assertEquals(2, system.computeMaxFuelWith(9))
+    }
+
+    @Test
     fun complex1() {
         val system = SystemOfReaction(
             """
@@ -102,6 +137,8 @@ internal class SystemOfReactionTest {
         )
 
         assertEquals(13312, system.computeMinOREFor("FUEL"))
+        system.reset()
+        assertEquals(82892753, system.computeMaxFuelWith(1000000000000))
     }
 
     @Test
@@ -124,6 +161,8 @@ internal class SystemOfReactionTest {
         )
 
         assertEquals(180697, system.computeMinOREFor("FUEL"))
+        system.reset()
+        assertEquals(5586022, system.computeMaxFuelWith(1000000000000))
     }
 
     @Test
@@ -151,5 +190,7 @@ internal class SystemOfReactionTest {
         )
 
         assertEquals(2210736, system.computeMinOREFor("FUEL"))
+        system.reset()
+        assertEquals(460664, system.computeMaxFuelWith(1000000000000))
     }
 }

@@ -16,6 +16,6 @@ class SystemParser {
 
     private fun parseIngredient(part: String): Ingredient {
         val (quantity, chemical) = part.split(" ")
-        return Ingredient(quantity.toInt(), chemical)
+        return Ingredient(chemical, quantity.toLong())
     }
 }

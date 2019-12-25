@@ -10,7 +10,7 @@ fun main() {
 
     system.reset()
 
-//    println("Min number of ORE: ${system.computeMinOREFor(Ingredient(1000000000000, "FUEL"))}")
+    println("Min number of ORE: ${system.computeMaxFuelWith(1000000000000)}")
 }
 
 fun readInput(stringPath: String): String {
