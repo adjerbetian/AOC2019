@@ -1,93 +1,62 @@
 package day15
 
 import intCode.IntCodeComputer
-import java.lang.Thread.sleep
 
-typealias Direction = Int
 typealias StatusCode = Int
 
-const val NORTH = 1
-const val SOUTH = 2
-const val WEST = 3
-const val EAST = 4
-
-const val WALL = 0
-const val STEP = 1
-const val FINISH = 2
-
-data class Position(val x: Int, val y: Int) {
-    fun moveInDirection(direction: Direction): Position {
-        return when (direction) {
-            NORTH -> Position(x, y + 1)
-            SOUTH -> Position(x, y - 1)
-            WEST -> Position(x - 1, y)
-            EAST -> Position(x + 1, y)
-            else -> throw Error("invalid direction $direction")
-        }
-    }
-
-    operator fun minus(p: Position) = Position(x - p.x, y - p.y)
-}
-
 class Game(val computer: IntCodeComputer) {
-    val map = HashMap<Position, StatusCode>()
+    val map = HashMap<Position, Tile>()
     val distances = HashMap<Position, Int>()
     var steps = 0
     var currentPosition = Position(0, 0)
-    var direction = 1
+    var direction: Direction = NORTH
 
     init {
         distances[currentPosition] = 0
-        map[currentPosition] = STEP
+        map[currentPosition] = PATH
         computer.outputFunction = { treatMoveResponse(it.toInt()) }
         requireMove()
     }
 
     private fun treatMoveResponse(statusCode: StatusCode) {
-        map[currentPosition.moveInDirection(direction)] = statusCode
+        val tile = when (statusCode) {
+            0 -> WALL
+            1 -> PATH
+            2 -> OXYGEN
+            else -> throw Error("invalid status code: $statusCode")
+        }
 
-        when (statusCode) {
-            WALL -> turnRight()
-            STEP -> stepForward()
-            FINISH -> {
+        map[currentPosition.moveInDirection(direction)] = tile
+
+//        val statusCode = if (currentPosition.moveInDirection(direction) == Position(0, 0)) {
+//            FINISH
+//        } else if (code == FINISH) {
+//            STEP
+//        } else {
+//            code
+//        }
+
+        when (tile) {
+            WALL -> direction = direction.turnRight()
+            PATH -> stepForward()
+            OXYGEN -> {
                 showGame()
                 println("path length: ${getPath().size}")
-                throw Error("FINISHED")
+                throw Error("Oxygen found !")
             }
-            else -> throw Error("unknown status code $statusCode")
         }
         requireMove()
-    }
-
-    private fun turnRight() {
-        direction = when (direction) {
-            NORTH -> EAST
-            EAST -> SOUTH
-            SOUTH -> WEST
-            WEST -> NORTH
-            else -> throw Error("not possible")
-        }
-    }
-
-    private fun turnLeft() {
-        direction = when (direction) {
-            NORTH -> WEST
-            WEST -> SOUTH
-            SOUTH -> EAST
-            EAST -> NORTH
-            else -> throw Error("not possible")
-        }
     }
 
     private fun stepForward() {
         currentPosition = currentPosition.moveInDirection(direction)
         distances[currentPosition] = ++steps
 
-        turnLeft()
+        direction = direction.turnLeft()
     }
 
     private fun requireMove() {
-        computer.addInput(direction.toLong())
+        computer.addInput(direction.code)
     }
 
     private fun minX() = map.keys.map { p -> p.x }.min()!!
@@ -106,29 +75,13 @@ class Game(val computer: IntCodeComputer) {
         for (y in maxY() downTo minY()) {
             for (x in minX()..maxX()) {
                 if (Position(x, y) == currentPosition) {
-                    result += colorizer.colorize(
-                        when (direction) {
-                            NORTH -> "△"
-                            EAST -> "▷"
-                            SOUTH -> "▽"
-                            WEST -> "◁"
-                            else -> throw Error("not possible")
-                        }, colorizer.RED
-                    )
+                    result += colorizer.colorize(direction.toString(), colorizer.RED)
                 } else if (Position(x, y) == Position(0, 0)) {
                     result += colorizer.colorize("●", colorizer.GREEN)
                 } else if (path.contains(Position(x, y))) {
                     result += colorizer.colorize("●", colorizer.BLUE)
                 } else {
-                    result += colorizer.colorize(
-                        when (map[Position(x, y)]) {
-                            null -> " "
-                            WALL -> "▯"
-                            STEP -> "."
-                            FINISH -> "X"
-                            else -> throw Error("not possible")
-                        }, colorizer.WHITE
-                    )
+                    result += colorizer.colorize(map[Position(x, y)]?.toString() ?: " ", colorizer.WHITE)
                 }
             }
             result += "\n"
@@ -154,18 +107,3 @@ class Game(val computer: IntCodeComputer) {
     }
 }
 
-class Colorizer() {
-    val RESET = "\u001B[0m"
-    val BLACK = "\u001B[30m"
-    val RED = "\u001B[31m"
-    val GREEN = "\u001B[32m"
-    val YELLOW = "\u001B[33m"
-    val BLUE = "\u001B[34m"
-    val PURPLE = "\u001B[35m"
-    val CYAN = "\u001B[36m"
-    val WHITE = "\u001B[37m"
-
-    fun colorize(message: String, color: String): String {
-        return color + message + RESET
-    }
-}
