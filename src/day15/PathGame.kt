@@ -4,10 +4,10 @@ import intCode.IntCodeComputer
 
 class PathGame(val computer: IntCodeComputer) {
     private val droid = RepairDroid()
-    private val tileMap = ShipMap(droid)
+    private val shipMap = ShipMap(droid)
 
     init {
-        tileMap[droid.position] = PATH
+        shipMap[droid.position] = PATH
         computer.outputFunction = fun(statusCode: Long) {
             val tile = when (statusCode.toInt()) {
                 0 -> WALL
@@ -24,12 +24,11 @@ class PathGame(val computer: IntCodeComputer) {
         try {
             computer.run()
         } catch (err: OxygenFound) {
-            return
         }
     }
 
     private fun treatTile(tile: Tile) {
-        tileMap[droid.getNextPosition()] = tile
+        shipMap[droid.getNextPosition()] = tile
 
         when (tile) {
             WALL -> droid.turn()
@@ -46,11 +45,9 @@ class PathGame(val computer: IntCodeComputer) {
         computer.addInput(droid.direction.code)
     }
 
-    fun printMap() = println(toString())
+    override fun toString() = shipMap.toString()
 
-    override fun toString() = tileMap.toString()
-
-    fun getPathToOxygen() = tileMap.getPathToOxygen()
+    fun getPathToOxygen() = shipMap.getPathToOxygen()
 
     class OxygenFound : Error()
     class BackToStart : Error()

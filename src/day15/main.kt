@@ -15,7 +15,7 @@ fun runPart1(program: IntCodeProgram) {
     val game = PathGame(computer)
 
     game.explorePathToOxygen()
-    game.printMap()
+    println(game)
     val path = game.getPathToOxygen()
     println("Path length: ${path.size}")
 }
