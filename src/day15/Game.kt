@@ -2,8 +2,6 @@ package day15
 
 import intCode.IntCodeComputer
 
-typealias StatusCode = Int
-
 class Game(val computer: IntCodeComputer) {
     val map = HashMap<Position, Tile>()
     val distances = HashMap<Position, Int>()
@@ -14,38 +12,38 @@ class Game(val computer: IntCodeComputer) {
     init {
         distances[currentPosition] = 0
         map[currentPosition] = PATH
-        computer.outputFunction = { treatMoveResponse(it.toInt()) }
-        requireMove()
+        computer.outputFunction = fun(statusCode: Long) {
+            val tile = when (statusCode.toInt()) {
+                0 -> WALL
+                1 -> PATH
+                2 -> OXYGEN
+                else -> throw Error("invalid status code: $statusCode")
+            }
+            treatTile(tile)
+        }
     }
 
-    private fun treatMoveResponse(statusCode: StatusCode) {
-        val tile = when (statusCode) {
-            0 -> WALL
-            1 -> PATH
-            2 -> OXYGEN
-            else -> throw Error("invalid status code: $statusCode")
+    fun explorePathToOxygen() {
+        explore()
+        try {
+            computer.run()
+        } catch (err: OxygenFound) {
+            return
         }
+    }
 
+    private fun treatTile(tile: Tile) {
         map[currentPosition.moveInDirection(direction)] = tile
-
-//        val statusCode = if (currentPosition.moveInDirection(direction) == Position(0, 0)) {
-//            FINISH
-//        } else if (code == FINISH) {
-//            STEP
-//        } else {
-//            code
-//        }
 
         when (tile) {
             WALL -> direction = direction.turnRight()
-            PATH -> stepForward()
-            OXYGEN -> {
-                showGame()
-                println("path length: ${getPath().size}")
-                throw Error("Oxygen found !")
-            }
+            else -> stepForward()
         }
-        requireMove()
+
+        if (tile is OXYGEN) throw OxygenFound()
+        if (currentPosition == Position(0, 0) && direction == NORTH) throw BackToStart()
+
+        explore()
     }
 
     private fun stepForward() {
@@ -55,7 +53,7 @@ class Game(val computer: IntCodeComputer) {
         direction = direction.turnLeft()
     }
 
-    private fun requireMove() {
+    private fun explore() {
         computer.addInput(direction.code)
     }
 
@@ -64,46 +62,49 @@ class Game(val computer: IntCodeComputer) {
     private fun minY() = map.keys.map { p -> p.y }.min()!!
     private fun maxY() = map.keys.map { p -> p.y }.max()!!
 
-    private fun showGame() {
+    fun printMap() {
         println(toString())
     }
 
     override fun toString(): String {
-        val path = getPath()
+        val path = getPathToOxygen()
         var result = ""
-        val colorizer = Colorizer()
         for (y in maxY() downTo minY()) {
             for (x in minX()..maxX()) {
-                if (Position(x, y) == currentPosition) {
-                    result += colorizer.colorize(direction.toString(), colorizer.RED)
-                } else if (Position(x, y) == Position(0, 0)) {
-                    result += colorizer.colorize("●", colorizer.GREEN)
-                } else if (path.contains(Position(x, y))) {
-                    result += colorizer.colorize("●", colorizer.BLUE)
-                } else {
-                    result += colorizer.colorize(map[Position(x, y)]?.toString() ?: " ", colorizer.WHITE)
-                }
+                result += stringifyPosition(Position(x, y), path)
             }
             result += "\n"
         }
         return result
     }
 
-    private fun getPath(): List<Position> {
+    private fun stringifyPosition(position: Position, path: List<Position> = emptyList()): String {
+        val colorizer = Colorizer()
+        return when {
+            map[position] == null -> " "
+            map[position] is WALL -> colorizer.colorize("▯", colorizer.BLACK)
+            map[position] is OXYGEN -> colorizer.colorize("●", colorizer.BLUE)
+            position == currentPosition -> colorizer.colorize(direction.toString(), colorizer.RED)
+            position == Position(0, 0) -> colorizer.colorize("●", colorizer.YELLOW)
+            path.contains(position) -> colorizer.colorize("●", colorizer.GREEN)
+            map[position] is PATH -> "."
+            else -> throw Error("not possible")
+        }
+    }
+
+    fun getPathToOxygen(): List<Position> {
         val path = mutableListOf(Position(0, 0))
         var position = Position(0, 0)
 
         while (position != currentPosition) {
-            position = listOf(
-                position.moveInDirection(NORTH),
-                position.moveInDirection(EAST),
-                position.moveInDirection(SOUTH),
-                position.moveInDirection(WEST)
-            ).maxBy { distances[it] ?: -1 }!!
+            position = position.getNeighbors().maxBy { distances[it] ?: -1 }!!
             path.add(position)
         }
 
         return path
     }
+
+    class OxygenFound : Error()
+    class BackToStart : Error()
 }
 

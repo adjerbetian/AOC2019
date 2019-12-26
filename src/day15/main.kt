@@ -13,7 +13,8 @@ fun runPart1(program: IntCodeProgram) {
     val computer = IntCodeComputer(program)
     val game = Game(computer)
 
-    computer.run()
-
-    println("Smallest number of steps: ${game.distances.size}")
+    game.explorePathToOxygen()
+    game.printMap()
+    val path = game.getPathToOxygen()
+    println("Path length: ${path.size}")
 }

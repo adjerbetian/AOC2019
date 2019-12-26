@@ -10,5 +10,14 @@ data class Position(val x: Int, val y: Int) {
         }
     }
 
+    fun getNeighbors(): List<Position> {
+        return listOf(
+            moveInDirection(NORTH),
+            moveInDirection(EAST),
+            moveInDirection(SOUTH),
+            moveInDirection(WEST)
+        )
+    }
+
     operator fun minus(p: Position) = Position(x - p.x, y - p.y)
 }

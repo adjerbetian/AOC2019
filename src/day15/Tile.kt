@@ -6,7 +6,7 @@ object WALL : Tile() {
 }
 
 object PATH : Tile() {
-    override fun toString() = "."
+    override fun toString() = "●"
 }
 
 object OXYGEN : Tile() {
