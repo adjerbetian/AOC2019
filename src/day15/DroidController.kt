@@ -3,8 +3,8 @@ package day15
 import intCode.IntCodeComputer
 
 class DroidController(val computer: IntCodeComputer, val onTile: (tile: Tile) -> Unit) {
-    private val droid = RepairDroid()
-    private val shipMap = ShipMap(droid)
+    val droid = RepairDroid()
+    val shipMap = ShipMap(droid)
 
     init {
         shipMap[droid.position] = PATH
@@ -42,7 +42,5 @@ class DroidController(val computer: IntCodeComputer, val onTile: (tile: Tile) ->
     }
 
     override fun toString() = shipMap.toString()
-
-    fun getPathToOxygen() = shipMap.getPathToOxygen()
 }
 

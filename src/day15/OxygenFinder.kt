@@ -16,7 +16,7 @@ class OxygenFinder(val computer: IntCodeComputer) {
         }
     }
 
-    fun getPathToOxygen() = controller.getPathToOxygen()
+    fun getPathToOxygen() = controller.shipMap.getPathToOxygen()
 
     override fun toString(): String = controller.toString()
 
