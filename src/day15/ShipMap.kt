@@ -1,7 +1,7 @@
 package day15
 
 class ShipMap(private val droid: RepairDroid) {
-    private val tileMap = HashMap<Position, Tile>()
+    val tileMap = HashMap<Position, Tile>()
     private val distanceMap = HashMap<Position, Int>()
 
     operator fun get(position: Position): Tile = tileMap[position]!!

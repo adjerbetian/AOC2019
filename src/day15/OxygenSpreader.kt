@@ -1,29 +1,26 @@
 package day15
 
-import intCode.IntCodeComputer
-
-class OxygenSpreader(val computer: IntCodeComputer) {
-    private val controller = DroidController(computer) { hasFoundOxygen() }
-
-    private fun hasFoundOxygen() {
-        if (controller.droid.position == Position(0, 0) && controller.droid.direction == NORTH)
-            throw BackToBase()
-    }
-
-    fun exploreMap() {
-        try {
-            controller.explore()
-        } catch (e: BackToBase) {
-        }
-    }
+class OxygenSpreader(shipMap: ShipMap) {
+    private val oxygenCells = shipMap.tileMap.filter { it.value == OXYGEN }.keys.toMutableSet()
+    private val emptyCells = shipMap.tileMap.filter { it.value == PATH }.keys.toMutableSet()
+    private var boundary = oxygenCells.toSet()
+    private var minutes = 0
 
     fun spreadOxygen(): Int {
-        println(controller.toString())
-        return 0
+        while (emptyCells.isNotEmpty()) {
+            spreadOneMinute()
+            minutes++
+        }
+        return minutes
     }
 
-    override fun toString(): String = controller.toString()
-
-    class BackToBase : Error()
+    private fun spreadOneMinute() {
+        boundary = boundary.map { boundaryPosition ->
+            boundaryPosition.getNeighbors().filter {
+                emptyCells.contains(it)
+            }
+        }.flatten().toSet()
+        oxygenCells.addAll(boundary)
+        emptyCells.removeAll(boundary)
+    }
 }
-

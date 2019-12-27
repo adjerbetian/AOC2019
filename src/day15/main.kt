@@ -12,19 +12,20 @@ fun main() {
 
 fun runPart1(program: IntCodeProgram) {
     val computer = IntCodeComputer(program)
-    val finder = OxygenFinder(computer)
+    val explorer = OxygenShipExplorer(computer)
 
-    finder.findOxygen()
+    explorer.findOxygen()
 
-    println(finder)
-    println("Path length: ${finder.getPathToOxygen().size}")
+    println(explorer)
+    println("Path length: ${explorer.getPathToOxygen().size}")
 }
 
 fun runPart2(program: IntCodeProgram) {
     val computer = IntCodeComputer(program)
-    val spreader = OxygenSpreader(computer)
+    val explorer = FullShipExplorer(computer)
 
-    spreader.exploreMap()
-    val steps = spreader.spreadOxygen()
+    val shipMap = explorer.exploreMap()
+    val steps = OxygenSpreader(shipMap).spreadOxygen()
+
     println("Steps to spread oxygen length: $steps")
 }

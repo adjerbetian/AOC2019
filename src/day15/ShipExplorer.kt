@@ -2,7 +2,7 @@ package day15
 
 import intCode.IntCodeComputer
 
-class DroidController(val computer: IntCodeComputer, val onTile: (tile: Tile) -> Unit) {
+class ShipExplorer(val computer: IntCodeComputer, val onTile: (tile: Tile) -> Unit) {
     val droid = RepairDroid()
     val shipMap = ShipMap(droid)
 
