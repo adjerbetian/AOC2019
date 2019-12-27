@@ -12,11 +12,11 @@ fun main() {
 
 fun runPart1(program: IntCodeProgram) {
     val computer = IntCodeComputer(program)
-    val game = PathGame(computer)
+    val finder = OxygenFinder(computer)
 
-    game.explorePathToOxygen()
-    println(game)
-    val path = game.getPathToOxygen()
+    finder.findOxygen()
+    println(finder)
+    val path = finder.getPathToOxygen()
     println("Path length: ${path.size}")
 }
 
