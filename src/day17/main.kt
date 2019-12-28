@@ -11,11 +11,10 @@ fun main() {
 
 fun runPart1(program: IntCodeProgram) {
     val computer = IntCodeComputer(program)
-    val camera = Camera(computer)
 
-    val image = camera.getImage()
-
-    ImagePrinter(image).print()
+    computer.run()
+    val image = ImageConverter.parse(computer.outputs)
+    ImageConverter.print(image)
 
     val result = image.getIntersections().sumBy { it.getAlignmentParameter() }
     println("The sum of the alignment parameters is $result")
