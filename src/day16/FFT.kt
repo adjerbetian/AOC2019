@@ -2,27 +2,30 @@ package day16
 
 import kotlin.math.abs
 
+// a_k = input_k
+// b_l =     sum_(k=0..N) { p_(l,k) * a_k }
+// c_m =     sum_(l=0..N) { p_(m,l) * b_l }
+//     =     sum_(l=0..N) { p_(l,k) * sum_(k=0..N) { p_(m,l) * a_k }}
+//     =   sum_(k,l=0..N) { p_(m,l) * p_(l,k) * a_k }
+// d_n = sum_(k,l,m=0..N) { p_(n,m) * p_(m,l) * p_(l,k) * a_k }
+//     = sum_(k,l,m=0..N) { p_(n,m,l,k) * a_k }
+
+
 class FFT(val input: String) {
-    private val pattern = arrayOf(0, 1, 0, -1)
-    private var current = input.map { it.toString().toInt() }.toIntArray()
+    private var current = input.map { it.toString().toInt() }
 
     fun apply(): String {
-        val output = IntArray(current.size)
-        for (i in current.indices) {
-            output[i] = apply(i)
-            output[i] = abs(output[i]) % 10
-        }
-        current = output
+        current = current.indices.map { abs(apply(it)) % 10 }
         return getCurrent()
     }
 
-    private fun apply(index: Int): Int {
-        var result = 0
-        for (i in current.indices) {
-            val patternIndex = ((i + 1) / (index + 1)) % pattern.size
-            result += current[i] * pattern[patternIndex]
-        }
-        return result
+    private fun apply(l: Int): Int {
+        return current.mapIndexed { k, ak -> p(k, l) * ak }.sum()
+    }
+
+    private fun p(i: Int, j: Int): Int {
+        val index = ((i + 1) / (j + 1)) % 4
+        return arrayOf(0, 1, 0, -1)[index]
     }
 
     fun getCurrent(): String {
