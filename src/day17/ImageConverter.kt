@@ -1,34 +1,40 @@
 package day17
 
 object ImageConverter {
-    fun print(image: Image) {
-        val width = image.getWidth()
-        val height = image.getHeight()
+    fun print(image: Image) = println(stringify(image))
 
-        for (top in 0 until height) {
-            for (left in 0 until width) {
-                val p = Position(left, top)
-
-                if (image.isIntersection(p))
-                    print("O")
-                else
-                    print(image[p])
-            }
-            print("\n")
-        }
+    fun stringify(image: Image): String {
+        return stringifyWith(image) { null }
     }
 
-    fun parse(outputs: List<Long>): Image {
+    fun stringifyWith(image: Image, positionStringifier: (Position) -> String?): String {
+        val height = image.getHeight()
+        val width = image.getWidth()
+
+        var result = ""
+        for (top in 0 until height) {
+            for (left in 0 until width)
+                result += positionStringifier(Position(left, top)) ?: image[Position(left, top)]
+            result += "\n"
+        }
+        return result.trimEnd()
+    }
+
+    fun parse(outputs: List<Long>): Image = parse(
+        outputs.joinToString("") { it.toChar().toString() }
+    )
+
+    fun parse(outputs: String): Image {
         val map = ImageMap()
 
         var left = 0
         var top = 0
         for (output in outputs) {
-            if (output == '\n'.toLong()) {
+            if (output == '\n') {
                 left = 0
                 top++
             } else {
-                map[Position(left, top)] = output.toChar()
+                map[Position(left, top)] = output
                 left++
             }
         }
