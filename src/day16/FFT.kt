@@ -2,13 +2,13 @@ package day16
 
 import kotlin.math.abs
 
-class FFT(input: String) {
+class FFT(val input: String) {
     private val pattern = arrayOf(0, 1, 0, -1)
-    private var current = input.map { it.toString().toInt() }
+    private var current = input.map { it.toString().toInt() }.toIntArray()
 
     fun apply(): String {
-        val output = MutableList(current.size) { 0 }
-        for (i in 0 until current.size) {
+        val output = IntArray(current.size)
+        for (i in current.indices) {
             output[i] = apply(i)
             output[i] = abs(output[i]) % 10
         }
@@ -18,7 +18,7 @@ class FFT(input: String) {
 
     private fun apply(index: Int): Int {
         var result = 0
-        for (i in 0 until current.size) {
+        for (i in current.indices) {
             val patternIndex = ((i + 1) / (index + 1)) % pattern.size
             result += current[i] * pattern[patternIndex]
         }
@@ -27,5 +27,10 @@ class FFT(input: String) {
 
     fun getCurrent(): String {
         return current.joinToString("")
+    }
+
+    fun getCurrentWithOffset(): String {
+        val offset = input.substring(0, 7).toInt()
+        return getCurrent().substring(offset, offset + 8)
     }
 }

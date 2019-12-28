@@ -3,6 +3,7 @@ package day16
 import org.junit.jupiter.api.Test
 
 import org.junit.jupiter.api.Assertions.*
+import org.junit.jupiter.api.Disabled
 
 internal class FFTTest {
     @Test
@@ -19,26 +20,38 @@ internal class FFTTest {
     fun complex1() {
         val fft = FFT("80871224585914546619083218645595")
 
-        repeat(99) { fft.apply() }
+        repeat(100) { fft.apply() }
 
-        assertEquals("24176176", fft.apply().substring(0, 8))
+        assertEquals("24176176", fft.getCurrent().substring(0, 8))
     }
 
     @Test
     fun complex2() {
         val fft = FFT("19617804207202209144916044189917")
 
-        repeat(99) { fft.apply() }
+        repeat(100) { fft.apply() }
 
-        assertEquals("73745418", fft.apply().substring(0, 8))
+        assertEquals("73745418", fft.getCurrent().substring(0, 8))
     }
 
     @Test
     fun complex3() {
         val fft = FFT("69317163492948606335995924319873")
 
-        repeat(99) { fft.apply() }
+        repeat(100) { fft.apply() }
 
-        assertEquals("52432133", fft.apply().substring(0, 8))
+        assertEquals("52432133", fft.getCurrent().substring(0, 8))
+    }
+
+    @Disabled
+    @Test
+    fun longComplex1() {
+        val fft = FFT("03036732577212944063491565474664".repeat(10000))
+
+        fft.apply()
+        println(fft.getCurrent())
+
+        assertEquals("48226158", fft.getCurrentWithOffset())
+        assertEquals("48226158", fft.getCurrentWithOffset())
     }
 }
