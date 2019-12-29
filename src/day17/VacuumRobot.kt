@@ -23,22 +23,22 @@ class VacuumRobot(var position: Position, var direction: Direction) {
         path.add('L')
     }
 
-    fun getPath(): List<Char> {
-        val result = mutableListOf('0')
+    fun getPath(): List<String> {
+        val result = mutableListOf("0")
         for (i in path.indices) {
             if (path[i] == 'R') {
-                result.add('R')
-                result.add('0')
+                result.add("R")
+                result.add("0")
             }
             if (path[i] == 'L') {
-                result.add('L')
-                result.add('0')
+                result.add("L")
+                result.add("0")
             }
             if (path[i] == 'F') {
-                result[result.lastIndex] = (result.last().toString().toInt() + 1).toString()[0]
+                result[result.lastIndex] = (result.last().toInt() + 1).toString()
             }
         }
-        if (result[0] == '0')
+        if (result[0] == "0")
             result.removeAt(0)
 
         return result

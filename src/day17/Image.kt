@@ -16,7 +16,7 @@ class Image(private val map: ImageMap) {
         return this[position] == '#'
     }
 
-    fun getScaffoldPath(): List<Char> {
+    fun getScaffoldPath(): List<String> {
         val robot = getRobot()
         while (robot.getPossibleNext().any { isScaffold(it) }) {
             when {
