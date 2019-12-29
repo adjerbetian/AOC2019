@@ -20,6 +20,7 @@ class Vault(textMap: String) {
     val map = parseKeyMap(textMap)
     var bestPathLength = Int.MAX_VALUE
     var bestPath: List<Key> = emptyList()
+    var i = 0
 
     fun getAvailableKeysFrom(position: Position, keys: List<Key>): List<KeyDistance> {
         val newKeys = mutableListOf<KeyDistance>()
@@ -69,7 +70,8 @@ class Vault(textMap: String) {
 
     private fun explorePossibleKeyPaths(keyPath: List<Key>, pathLength: Int) {
         if (pathLength >= bestPathLength) {
-            println("cutting path of length $pathLength - $keyPath")
+            if (i++ % 125 == 0) println()
+            print(".")
             return
         }
 
