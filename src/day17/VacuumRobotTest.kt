@@ -18,7 +18,7 @@ internal class VacuumRobotTest {
         robot.turnRight()
         robot.moveForward()
 
-        assertEquals(listOf('3', 'L', '2', 'R', '1'), robot.getPath())
+        assertEquals(listOf("3", "L", "2", "R", "1"), robot.getPath())
     }
 
     @Test
@@ -29,6 +29,6 @@ internal class VacuumRobotTest {
         robot.moveForward()
         robot.moveForward()
 
-        assertEquals(listOf('R', '2'), robot.getPath())
+        assertEquals(listOf("R", "2"), robot.getPath())
     }
 }
