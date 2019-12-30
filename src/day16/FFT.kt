@@ -12,10 +12,10 @@ import kotlin.math.abs
 
 
 class FFT(val input: String) {
-    private var current = input.map { it.toString().toInt() }
+    private var current = input.map { it.toString().toInt() }.toMutableList()
 
     fun apply(): String {
-        current = current.indices.map { abs(apply(it)) % 10 }
+        current = current.indices.map { abs(apply(it)) % 10 }.toMutableList()
         return getCurrent()
     }
 
@@ -33,7 +33,17 @@ class FFT(val input: String) {
     }
 
     fun getCurrentWithOffset(): String {
-        val offset = input.substring(0, 7).toInt()
+        val offset = getOffset()
         return getCurrent().substring(offset, offset + 8)
+    }
+
+    fun apply2() {
+        for (i in current.lastIndex - 1 downTo getOffset()) {
+            current[i] = abs(current[i] + current[i + 1]) % 10
+        }
+    }
+
+    private fun getOffset(): Int {
+        return input.substring(0, 7).toInt()
     }
 }

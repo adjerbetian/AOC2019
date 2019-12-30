@@ -13,15 +13,17 @@ fun runPart1(input: String) {
 
     repeat(100) { fft.apply() }
 
-    println(fft.getCurrent().substring(0, 8))
+    println("part 1: ${fft.getCurrent().substring(0, 8)}")
 }
 
 fun runPart2(input: String) {
     val fft = FFT(input.repeat(10000))
 
-    repeat(100) { fft.apply() }
+    repeat(100) { fft.apply2() }
 
-    println(fft.getCurrentWithOffset())
+    println("part 2: ${fft.getCurrentWithOffset()}")
+
+    // > 68969419
 }
 
 fun readInput(stringPath: String): String {

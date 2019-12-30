@@ -48,10 +48,8 @@ internal class FFTTest {
     fun longComplex1() {
         val fft = FFT("03036732577212944063491565474664".repeat(10000))
 
-        fft.apply()
-        println(fft.getCurrent())
+        repeat(100) { fft.apply2() }
 
-        assertEquals("48226158", fft.getCurrentWithOffset())
-        assertEquals("48226158", fft.getCurrentWithOffset())
+        assertEquals("84462026", fft.getCurrentWithOffset())
     }
 }
