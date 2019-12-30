@@ -43,7 +43,6 @@ internal class FFTTest {
         assertEquals("52432133", fft.getCurrent().substring(0, 8))
     }
 
-    @Disabled
     @Test
     fun longComplex1() {
         val fft = FFT("03036732577212944063491565474664".repeat(10000))
@@ -51,5 +50,23 @@ internal class FFTTest {
         repeat(100) { fft.apply2() }
 
         assertEquals("84462026", fft.getCurrentWithOffset())
+    }
+
+    @Test
+    fun longComplex2() {
+        val fft = FFT("02935109699940807407585447034323".repeat(10000))
+
+        repeat(100) { fft.apply2() }
+
+        assertEquals("78725270", fft.getCurrentWithOffset())
+    }
+
+    @Test
+    fun longComplex3() {
+        val fft = FFT("03081770884921959731165446850517".repeat(10000))
+
+        repeat(100) { fft.apply2() }
+
+        assertEquals("53553731", fft.getCurrentWithOffset())
     }
 }

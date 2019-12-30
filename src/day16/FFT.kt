@@ -2,15 +2,6 @@ package day16
 
 import kotlin.math.abs
 
-// a_k = input_k
-// b_l =     sum_(k=0..N) { p_(l,k) * a_k }
-// c_m =     sum_(l=0..N) { p_(m,l) * b_l }
-//     =     sum_(l=0..N) { p_(l,k) * sum_(k=0..N) { p_(m,l) * a_k }}
-//     =   sum_(k,l=0..N) { p_(m,l) * p_(l,k) * a_k }
-// d_n = sum_(k,l,m=0..N) { p_(n,m) * p_(m,l) * p_(l,k) * a_k }
-//     = sum_(k,l,m=0..N) { p_(n,m,l,k) * a_k }
-
-
 class FFT(val input: String) {
     private var current = input.map { it.toString().toInt() }.toMutableList()
 
