@@ -3,6 +3,7 @@ package day18
 data class KeyDistance(val key: Key, val distance: Int)
 
 class Vault(textMap: String) {
+    private val progressPrinter = ProgressPrinter()
     private val map = parseKeyMap(textMap)
     private var bestPathLength = Int.MAX_VALUE
     private var bestPath: List<Key> = emptyList()
@@ -84,7 +85,6 @@ class Vault(textMap: String) {
             .filter { !keys.contains(it.first) }
             .filter { doors.containsAll(it.third) }
             .map { KeyDistance(it.first, it.second) }
-            .sortedBy { it.distance }
     }
 
     private fun isAccessible(position: Position, keys: List<Key>): Boolean {
@@ -116,16 +116,7 @@ class Vault(textMap: String) {
 
     private fun explorePossibleKeyPaths(keyPath: MutableList<Key>, pathLength: Int) {
         if (pathLength >= bestPathLength) {
-            i++
-            if (i % 10000000 == 0) println()
-            if (i % 100000 == 0) print(".")
-            return
-        }
-
-        if (pathLength + minDistances[allKeys.size - keyPath.size] >= bestPathLength) {
-            i++
-            if (i % 10000000 == 0) println()
-            if (i % 100000 == 0) print("X")
+            progressPrinter.trackProgress('.')
             return
         }
 
@@ -133,6 +124,23 @@ class Vault(textMap: String) {
             bestPathLength = pathLength
             bestPath = keyPath.map { it }
             println("\nfound key path of length $bestPathLength : $bestPath")
+        }
+
+        if (pathLength + minDistances[allKeys.size - keyPath.size] >= bestPathLength) {
+            progressPrinter.trackProgress('*')
+            return
+        }
+
+        if (keyPath.isNotEmpty()) {
+            val maxD = keysFromKey[keyPath.last()]!!
+                .filter { !keyPath.contains(it.first) }
+                .map { it.second }
+                .max()!!
+
+            if (pathLength + maxD >= bestPathLength) {
+                progressPrinter.trackProgress('X')
+                return
+            }
         }
 
         val position = if (keyPath.isEmpty())
@@ -176,4 +184,24 @@ fun parseKeyMap(textMap: String): HashMap<Position, MapElement> {
     }
 
     return result
+}
+
+class ProgressPrinter() {
+    private val N = 1000000
+    private var progress = 0
+    private val counters = HashMap<Char, Long>()
+
+    fun trackProgress(char: Char) {
+        counters[char] = (counters[char] ?: 0) + 1
+        printProgress()
+    }
+
+    private fun printProgress() {
+        progress++
+        if (progress % N == 0) {
+            counters.entries.forEach { println("${it.key} : ${it.value}") }
+            println("---")
+            progress = 0
+        }
+    }
 }
