@@ -13,8 +13,12 @@ fun runPart1(textMap: String) {
     println(vault.getBestKeyPath())
     // < 5206
     // > 5000
+
     // != 5100
     // != 5200
+    // != 5201
+    // != 5205
+    // != 5206
 }
 
 fun runPart2() {

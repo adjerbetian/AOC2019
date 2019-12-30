@@ -3,16 +3,15 @@ package day18
 data class KeyDistance(val key: Key, val distance: Int)
 
 class Vault(textMap: String) {
-    private val progressPrinter = ProgressPrinter()
+    private val progressPrinter = ProgressPrinter(this)
     private val map = parseKeyMap(textMap)
-    private var bestPathLength = Int.MAX_VALUE
-    private var bestPath: List<Key> = emptyList()
+    var bestPathLength = Int.MAX_VALUE
+    var bestPath: List<Key> = emptyList()
     private val keysFromKey = HashMap<Key, List<Triple<Key, Int, List<Door>>>>()
     private val minDistanceBetweenKeys: Int
     private val minDistances: List<Int>
     private val allKeys = getAllKeys()
     private val keyPositions = HashMap<Key, Position>()
-    var i = 0
 
     init {
         allKeys.forEach { keyPositions[it] = getKeyPosition(it) }
@@ -160,48 +159,4 @@ class Vault(textMap: String) {
     }
 
     fun getKeyPosition(key: Key) = map.entries.find { it.value == key }!!.key
-}
-
-fun parseKeyMap(textMap: String): HashMap<Position, MapElement> {
-    val result = HashMap<Position, MapElement>()
-
-    var x = 0
-    var y = 0
-    for (c in textMap) {
-        if (c == '\n') {
-            x = 0
-            y++
-        } else {
-            result[Position(x++, y)] = when {
-                c == '.' -> OpenPassage
-                c == '@' -> Entrance
-                c == '#' -> Wall
-                c.isLetter() && c.isLowerCase() -> Key(c)
-                c.isLetter() && c.isUpperCase() -> Door(c)
-                else -> throw Error("character not recognized: $c")
-            }
-        }
-    }
-
-    return result
-}
-
-class ProgressPrinter() {
-    private val N = 1000000
-    private var progress = 0
-    private val counters = HashMap<Char, Long>()
-
-    fun trackProgress(char: Char) {
-        counters[char] = (counters[char] ?: 0) + 1
-        printProgress()
-    }
-
-    private fun printProgress() {
-        progress++
-        if (progress % N == 0) {
-            counters.entries.forEach { println("${it.key} : ${it.value}") }
-            println("---")
-            progress = 0
-        }
-    }
 }
