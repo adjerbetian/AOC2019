@@ -11,6 +11,10 @@ fun main() {
 fun runPart1(textMap: String) {
     val vault = Vault(textMap)
     println(vault.getBestKeyPath())
+    // < 5206
+    // > 5000
+    // != 5100
+    // != 5200
 }
 
 fun runPart2() {

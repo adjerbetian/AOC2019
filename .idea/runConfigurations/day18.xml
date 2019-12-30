@@ -1,5 +1,5 @@
 <component name="ProjectRunConfigurationManager">
-  <configuration default="false" name="day18" type="JetRunConfigurationType" factoryName="Kotlin">
+  <configuration default="false" name="day18" type="JetRunConfigurationType" factoryName="Kotlin" singleton="false">
     <module name="adventOfCode" />
     <option name="VM_PARAMETERS" value="" />
     <option name="PROGRAM_PARAMETERS" value="" />

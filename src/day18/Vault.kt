@@ -8,6 +8,7 @@ class Vault(textMap: String) {
     private var bestPath: List<Key> = emptyList()
     private val keysFromKey = HashMap<Key, List<Triple<Key, Int, List<Door>>>>()
     private val minDistanceBetweenKeys: Int
+    private val minDistances: List<Int>
     private val allKeys = getAllKeys()
     private val keyPositions = HashMap<Key, Position>()
     var i = 0
@@ -20,6 +21,13 @@ class Vault(textMap: String) {
                 .sortedBy { it.second }
         }
         minDistanceBetweenKeys = keysFromKey.values.flatten().map { it.second }.min()!!
+        val mutableMinDistancesList =
+            (listOf(0) + keysFromKey.values.flatten().map { it.second }.sorted().subList(
+                0,
+                allKeys.size
+            )).toMutableList()
+        for (i in 1 until mutableMinDistancesList.size) mutableMinDistancesList[i] += mutableMinDistancesList[i - 1]
+        minDistances = mutableMinDistancesList
     }
 
     private fun explorePaths(
@@ -102,11 +110,11 @@ class Vault(textMap: String) {
 
     fun getBestKeyPath(): Pair<List<Key>, Int> {
         bestPathLength = Int.MAX_VALUE
-        explorePossibleKeyPaths(emptyList(), 0)
+        explorePossibleKeyPaths(mutableListOf(), 0)
         return Pair(bestPath, bestPathLength)
     }
 
-    private fun explorePossibleKeyPaths(keyPath: List<Key>, pathLength: Int) {
+    private fun explorePossibleKeyPaths(keyPath: MutableList<Key>, pathLength: Int) {
         if (pathLength >= bestPathLength) {
             i++
             if (i % 10000000 == 0) println()
@@ -114,7 +122,7 @@ class Vault(textMap: String) {
             return
         }
 
-        if (pathLength + (allKeys.size - keyPath.size) * minDistanceBetweenKeys >= bestPathLength) {
+        if (pathLength + minDistances[allKeys.size - keyPath.size] >= bestPathLength) {
             i++
             if (i % 10000000 == 0) println()
             if (i % 100000 == 0) print("X")
@@ -123,7 +131,7 @@ class Vault(textMap: String) {
 
         if (keyPath.size == allKeys.size) {
             bestPathLength = pathLength
-            bestPath = keyPath
+            bestPath = keyPath.map { it }
             println("\nfound key path of length $bestPathLength : $bestPath")
         }
 
@@ -134,10 +142,12 @@ class Vault(textMap: String) {
 
         val newKeys = getAvailableKeysFrom(position, keyPath)
         newKeys.forEach {
+            keyPath.add(it.key)
             explorePossibleKeyPaths(
-                keyPath + it.key,
+                keyPath,
                 pathLength + it.distance
             )
+            keyPath.removeAt(keyPath.lastIndex)
         }
     }
 
