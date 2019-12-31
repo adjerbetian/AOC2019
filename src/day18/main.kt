@@ -9,7 +9,7 @@ fun main() {
 }
 
 fun runPart1(textMap: String) {
-    val vault = Vault(textMap)
+    val vault = VaultGraph(textMap)
     println(vault.getBestKeyPath())
 
     // == 5102
