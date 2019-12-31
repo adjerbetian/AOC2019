@@ -2,7 +2,6 @@ package day18
 
 sealed class MapElement
 object Wall : MapElement()
-object Entrance : MapElement()
 object OpenPassage : MapElement()
 data class Key(val letter: Char) : MapElement() {
     fun opens(door: Door) = door.letter.toLowerCase() == letter
@@ -28,8 +27,8 @@ fun parseKeyMap(textMap: String): HashMap<Position, MapElement> {
         } else {
             result[Position(x++, y)] = when {
                 c == '.' -> OpenPassage
-                c == '@' -> Entrance
                 c == '#' -> Wall
+                c == '@' -> Key('@')
                 c.isLetter() && c.isLowerCase() -> Key(c)
                 c.isLetter() && c.isUpperCase() -> Door(c)
                 else -> throw Error("character not recognized: $c")

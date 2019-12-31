@@ -6,7 +6,7 @@ import org.junit.jupiter.api.Test
 
 internal class VaultTest {
     @Test
-    fun getInitialPosition() {
+    fun getKeyPosition() {
         val vault = Vault(
             """
                 #########
@@ -15,7 +15,9 @@ internal class VaultTest {
             """.trimIndent()
         )
 
-        assertEquals(Position(5, 1), vault.getInitialPosition())
+        assertEquals(Position(5, 1), vault.getKeyPosition(Key('@')))
+        assertEquals(Position(7, 1), vault.getKeyPosition(Key('a')))
+        assertEquals(Position(1, 1), vault.getKeyPosition(Key('b')))
     }
 
     @Test
@@ -29,8 +31,8 @@ internal class VaultTest {
         )
 
         val keys = vault.getAvailableKeysFrom(
-            vault.getInitialPosition(),
-            emptyList()
+            Key('@'),
+            listOf(Key('@'))
         )
 
         assertEquals(
@@ -52,8 +54,8 @@ internal class VaultTest {
         )
 
         val keys = vault.getAvailableKeysFrom(
-            vault.getKeyPosition(Key('a')),
-            listOf(Key('a'))
+            Key('a'),
+            listOf(Key('@'), Key('a'))
         )
 
         assertEquals(
@@ -75,8 +77,8 @@ internal class VaultTest {
         )
 
         val keys = vault.getAvailableKeysFrom(
-            vault.getInitialPosition(),
-            emptyList()
+            Key('@'),
+            listOf(Key('@'))
         )
 
         assertEquals(
@@ -98,8 +100,8 @@ internal class VaultTest {
         )
 
         val keys = vault.getAvailableKeysFrom(
-            vault.getInitialPosition(),
-            listOf(Key('a'))
+            Key('@'),
+            listOf(Key('@'), Key('a'))
         )
 
         assertEquals(
@@ -122,7 +124,7 @@ internal class VaultTest {
 
         assertEquals(
             Pair(
-                keysOf("a, b"),
+                keysOf("@, a, b"),
                 8
             ),
             vault.getBestKeyPath()
@@ -143,7 +145,7 @@ internal class VaultTest {
 
         assertEquals(
             Pair(
-                keysOf("a, b, c, d, e, f"),
+                keysOf("@, a, b, c, d, e, f"),
                 86
             ),
             vault.getBestKeyPath()
@@ -164,7 +166,7 @@ internal class VaultTest {
 
         assertEquals(
             Pair(
-                keysOf("b, a, c, d, f, e, g"),
+                keysOf("@, b, a, c, d, f, e, g"),
                 132
             ),
             vault.getBestKeyPath()
@@ -190,7 +192,7 @@ internal class VaultTest {
 
         assertEquals(
             Pair(
-                keysOf("a, f, b, j, g, n, h, d, l, o, e, p, c, i, k, m"),
+                keysOf("@, a, f, b, j, g, n, h, d, l, o, e, p, c, i, k, m"),
                 136
             ),
             vault.getBestKeyPath()
@@ -212,7 +214,7 @@ internal class VaultTest {
 
         assertEquals(
             Pair(
-                keysOf("a, c, f, i, d, g, b, e, h"),
+                keysOf("@, a, c, f, i, d, g, b, e, h"),
                 81
             ),
             vault.getBestKeyPath()

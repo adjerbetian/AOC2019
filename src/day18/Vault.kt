@@ -1,40 +1,80 @@
 package day18
 
-data class KeyDistance(val key: Key, val distance: Int)
+data class KeyDistance(val key: Key, val distance: Int) {
+    override fun toString() = "$key: $distance"
+}
+
+
+data class KeyGraphNode(
+    val key: Key,
+    val distance: Int = 0,
+    val doors: List<Door> = emptyList(),
+    val edges: List<KeyGraphNode> = emptyList()
+) {
+    fun getAccessibleKeyDistances(keys: List<Key>): List<KeyDistance> {
+        val result = mutableListOf<KeyDistance>()
+        getAccessibleKeyDistances(keys, result)
+        return result
+    }
+
+    private fun getAccessibleKeyDistances(keys: List<Key>, result: MutableList<KeyDistance>) {
+        if (!keys.containsAll(doors.map { it.getKey() })) return
+
+        if (!keys.contains(key)) {
+            result.add(KeyDistance(key, distance))
+        } else {
+            edges.forEach { it.getAccessibleKeyDistances(keys, result) }
+        }
+    }
+
+    fun getDistances(): List<Int> = edges.flatMap { listOf(it.distance) + it.getDistances() }
+
+    fun getMaxDistance(keys: List<Key>): Int {
+        return getAllKeyDistances().filter { !keys.contains(it.key) }.map { it.distance }.max()!!
+    }
+
+    private fun getAllKeyDistances(): List<KeyDistance> {
+        val result = mutableListOf<KeyDistance>()
+        getAllKeyDistances(result)
+        return result
+    }
+
+    private fun getAllKeyDistances(result: MutableList<KeyDistance>) {
+        result.add(KeyDistance(key, distance))
+        edges.forEach { it.getAllKeyDistances(result) }
+    }
+}
 
 class Vault(textMap: String) {
     private val progressPrinter = ProgressPrinter(this)
     private val map = parseKeyMap(textMap)
     var bestPathLength = Int.MAX_VALUE
-    var bestPath: List<Key> = emptyList()
-    private val keysFromKey = HashMap<Key, List<Triple<Key, Int, List<Door>>>>()
-    private val minDistanceBetweenKeys: Int
-    private val minDistances: List<Int>
-    private val allKeys = getAllKeys()
+    private var bestPath: List<Key> = emptyList()
+    private val keysFromKey = HashMap<Key, KeyGraphNode>()
+    private val summedDistances: List<Int>
+    private val allKeys = map.values.filterIsInstance<Key>()
     private val keyPositions = HashMap<Key, Position>()
 
     init {
         allKeys.forEach { keyPositions[it] = getKeyPosition(it) }
         allKeys.forEach { key ->
-            keysFromKey[key] = explorePaths(listOf(keyPositions[key]!!), emptyList())
-                .filter { it.first != key }
-                .sortedBy { it.second }
+            keysFromKey[key] = buildKeyGraph(listOf(getKeyPosition(key)), emptyList(), 0).first()
         }
-        minDistanceBetweenKeys = keysFromKey.values.flatten().map { it.second }.min()!!
-        val mutableMinDistancesList =
-            (listOf(0) + keysFromKey.values.flatten().map { it.second }.sorted().subList(
-                0,
-                allKeys.size
-            )).toMutableList()
-        for (i in 1 until mutableMinDistancesList.size) mutableMinDistancesList[i] += mutableMinDistancesList[i - 1]
-        minDistances = mutableMinDistancesList
+
+        summedDistances = keysFromKey.values
+            .flatMap { it.getDistances() }
+            .sorted()
+            .subList(0, allKeys.size)
+            .fold(listOf(0)) { sum, distance -> sum + (sum.last() + distance) }
     }
 
-    private fun explorePaths(
+    private fun buildKeyGraph(
         path: List<Position>,
-        doors: List<Door>
-    ): List<Triple<Key, Int, List<Door>>> {
+        doors: List<Door>,
+        distance: Int
+    ): List<KeyGraphNode> {
         val last = map[path.last()]!!
+
         val newDoors = when (last) {
             is Door -> doors + last
             else -> doors
@@ -43,58 +83,20 @@ class Vault(textMap: String) {
         val neighbours = path.last().getNeighbors().filter { isAccessible(it) }.filter { !path.contains(it) }
 
         return if (last is Key) {
-            neighbours.flatMap { explorePaths(path + it, newDoors) } + Triple(last, path.size - 1, doors)
-        } else {
-            neighbours.flatMap { explorePaths(path + it, newDoors) }
-        }
-    }
-
-    fun getInitialPosition() = map.entries.find { it.value is Entrance }!!.key
-
-    fun getAvailableKeysFrom(position: Position, keys: List<Key>): List<KeyDistance> {
-        if (map[position] is Key) return getAvailableKeysFromKey(map[position] as Key, keys)
-
-        val newKeys = mutableListOf<KeyDistance>()
-        val explored = mutableListOf<Position>()
-        var boundary = listOf(position)
-        var distance = 0
-
-        while (boundary.isNotEmpty()) {
-            distance++
-
-            explored.addAll(boundary)
-            boundary = boundary
-                .flatMap { it.getNeighbors() }
-                .filter { isAccessible(it, keys) }
-                .filter { !explored.contains(it) }
-            newKeys.addAll(
-                boundary.map { map[it] }
-                    .filterIsInstance<Key>()
-                    .filter { !keys.contains(it) }
-                    .map { KeyDistance(it, distance) }
+            return listOf(
+                KeyGraphNode(
+                    last,
+                    distance,
+                    doors,
+                    neighbours.flatMap { buildKeyGraph(path + it, emptyList(), distance + 1) })
             )
-            boundary = boundary.filter { map[it] !is Key || keys.contains(map[it]) }
+        } else {
+            neighbours.flatMap { buildKeyGraph(path + it, newDoors, distance + 1) }
         }
-        return newKeys
     }
 
-    private fun getAvailableKeysFromKey(key: Key, keys: List<Key>): List<KeyDistance> {
-        val doors = keys.map { it.getDoor() }
-        return keysFromKey[key]!!
-            .filter { !keys.contains(it.first) }
-            .filter { doors.containsAll(it.third) }
-            .map { KeyDistance(it.first, it.second) }
-    }
-
-    private fun isAccessible(position: Position, keys: List<Key>): Boolean {
-        val element = map[position] ?: return false
-        return when (element) {
-            Wall -> false
-            Entrance -> true
-            OpenPassage -> true
-            is Key -> true
-            is Door -> keys.any { it.opens(element) }
-        }
+    fun getAvailableKeysFrom(key: Key, keys: List<Key>): List<KeyDistance> {
+        return keysFromKey[key]!!.getAccessibleKeyDistances(keys).sortedBy { it.distance }
     }
 
     private fun isAccessible(position: Position): Boolean {
@@ -105,17 +107,15 @@ class Vault(textMap: String) {
         }
     }
 
-    private fun getAllKeys() = map.values.filterIsInstance<Key>()
-
     fun getBestKeyPath(): Pair<List<Key>, Int> {
         bestPathLength = Int.MAX_VALUE
-        explorePossibleKeyPaths(mutableListOf(), 0)
+        explorePossibleKeyPaths(mutableListOf(Key('@')), 0)
         return Pair(bestPath, bestPathLength)
     }
 
     private fun explorePossibleKeyPaths(keyPath: MutableList<Key>, pathLength: Int) {
         if (pathLength >= bestPathLength) {
-            progressPrinter.trackProgress('.')
+            progressPrinter.trackProgress("Path")
             return
         }
 
@@ -125,29 +125,21 @@ class Vault(textMap: String) {
             println("\nfound key path of length $bestPathLength : $bestPath")
         }
 
-        if (pathLength + minDistances[allKeys.size - keyPath.size] >= bestPathLength) {
-            progressPrinter.trackProgress('*')
+        if (pathLength + summedDistances[allKeys.size - keyPath.size] >= bestPathLength) {
+            progressPrinter.trackProgress("Min D")
             return
         }
 
-        if (keyPath.isNotEmpty()) {
-            val maxD = keysFromKey[keyPath.last()]!!
-                .filter { !keyPath.contains(it.first) }
-                .map { it.second }
-                .max()!!
-
-            if (pathLength + maxD >= bestPathLength) {
-                progressPrinter.trackProgress('X')
-                return
-            }
+        val maxD = keysFromKey[keyPath.last()]!!.getMaxDistance(keyPath)
+        if (pathLength + maxD >= bestPathLength) {
+            progressPrinter.trackProgress("Max D")
+            return
         }
 
-        val position = if (keyPath.isEmpty())
-            getInitialPosition()
-        else
-            keyPositions[keyPath.last()]!!
+        val newKeys = getAvailableKeysFrom(keyPath.last(), keyPath)
 
-        val newKeys = getAvailableKeysFrom(position, keyPath)
+        if(newKeys.map { it.key }.toSet().size != newKeys.size) throw Error("not possible")
+
         newKeys.forEach {
             keyPath.add(it.key)
             explorePossibleKeyPaths(

@@ -6,10 +6,10 @@ import kotlin.collections.HashMap
 class ProgressPrinter(private val vault: Vault) {
     private val LOG_INTERVAL = 10000
     private var lastLog = Date().time
-    private val counters = HashMap<Char, Long>()
+    private val counters = HashMap<String, Long>()
 
-    fun trackProgress(char: Char) {
-        counters[char] = (counters[char] ?: 0) + 1
+    fun trackProgress(type: String) {
+        counters[type] = (counters[type] ?: 0) + 1
         printProgress()
     }
 
