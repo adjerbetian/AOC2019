@@ -3,7 +3,7 @@ package day18
 import java.util.*
 import kotlin.collections.HashMap
 
-class ProgressPrinter(private val graph: VaultGraph) {
+class ProgressPrinter(private val graph: VaultExplorer) {
     private val LOG_INTERVAL = 10000
     private var lastLog = Date().time
     private val counters = HashMap<String, Long>()
