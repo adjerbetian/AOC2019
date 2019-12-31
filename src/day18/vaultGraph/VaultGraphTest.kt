@@ -1,5 +1,6 @@
-package day18
+package day18.vaultGraph
 
+import day18.vault.Key
 import org.junit.jupiter.api.Test
 import kotlin.test.assertEquals
 

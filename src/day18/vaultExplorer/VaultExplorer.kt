@@ -1,4 +1,7 @@
-package day18
+package day18.vaultExplorer
+
+import day18.vault.Key
+import day18.vaultGraph.VaultGraph
 
 class VaultExplorer(private val graph: VaultGraph) {
     private val progressPrinter = ProgressPrinter(this)

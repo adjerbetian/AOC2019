@@ -1,4 +1,4 @@
-package day18
+package day18.vaultExplorer
 
 import java.util.*
 import kotlin.collections.HashMap

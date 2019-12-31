@@ -1,4 +1,4 @@
-package day18
+package day18.vault
 
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test

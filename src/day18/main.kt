@@ -1,5 +1,6 @@
 package day18
 
+import day18.vaultExplorer.VaultExplorer
 import java.io.File
 
 fun main() {

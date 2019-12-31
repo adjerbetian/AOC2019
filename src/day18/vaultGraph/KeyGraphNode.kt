@@ -1,4 +1,7 @@
-package day18
+package day18.vaultGraph
+
+import day18.vault.Door
+import day18.vault.Key
 
 data class KeyGraphNode(
     val key: Key,

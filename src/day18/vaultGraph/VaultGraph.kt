@@ -1,4 +1,9 @@
-package day18
+package day18.vaultGraph
+
+import day18.vault.Door
+import day18.vault.Key
+import day18.vault.Position
+import day18.vault.Vault
 
 class VaultGraph(private val vault: Vault) {
     val keys = vault.keys
@@ -83,3 +88,4 @@ class VaultGraph(private val vault: Vault) {
 
     fun getMaxDistance(key: Key, keys: List<Key>) = keysFromKey.getValue(key).getMaxDistance(keys)
 }
+
