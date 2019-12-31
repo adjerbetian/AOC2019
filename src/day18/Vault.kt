@@ -43,6 +43,8 @@ data class KeyGraphNode(
         result.add(KeyDistance(key, distance))
         edges.forEach { it.getAllKeyDistances(result) }
     }
+
+    fun getKeys(): List<Key> = listOf(key) + edges.flatMap { it.getKeys() }
 }
 
 class Vault(textMap: String) {
@@ -60,6 +62,13 @@ class Vault(textMap: String) {
         allKeys.forEach { key ->
             keysFromKey[key] = buildKeyGraph(listOf(getKeyPosition(key)), emptyList(), 0).first()
         }
+        keysFromKey[Key('@')] = buildKeyGraphFromEntrance()
+        keysFromKey.values.forEach {
+            val keys = it.getKeys().sortedBy { k -> k.letter }
+            if (keys.toSet().size != keys.size)
+                throw Error("incorrect for ${it.key}")
+        }
+
 
         summedDistances = keysFromKey.values
             .flatMap { it.getDistances() }
@@ -93,6 +102,35 @@ class Vault(textMap: String) {
         } else {
             neighbours.flatMap { buildKeyGraph(path + it, newDoors, distance + 1) }
         }
+    }
+
+    private fun buildKeyGraphFromEntrance(): KeyGraphNode {
+        val edges = mutableListOf<KeyGraphNode>()
+        val explored = mutableListOf<Position>()
+        var boundary = listOf(keyPositions[Key('@')]!!)
+        var distance = 0
+
+        while (boundary.isNotEmpty()) {
+            distance++
+
+            explored.addAll(boundary)
+            boundary = boundary
+                .flatMap { it.getNeighbors() }
+                .filter { isAccessible(it) }
+                .filter { map[it] !is Door }
+                .filter { !explored.contains(it) }
+                .toSet()
+                .toList()
+
+            edges.addAll(
+                boundary.map { map[it] }
+                    .filterIsInstance<Key>()
+                    .map { KeyGraphNode(it, distance) }
+            )
+
+            boundary = boundary.filter { map[it] !is Key }
+        }
+        return KeyGraphNode(Key('@'), 0, emptyList(), edges)
     }
 
     fun getAvailableKeysFrom(key: Key, keys: List<Key>): List<KeyDistance> {
@@ -138,7 +176,7 @@ class Vault(textMap: String) {
 
         val newKeys = getAvailableKeysFrom(keyPath.last(), keyPath)
 
-        if(newKeys.map { it.key }.toSet().size != newKeys.size) throw Error("not possible")
+        if (newKeys.map { it.key }.toSet().size != newKeys.size) throw Error("not possible")
 
         newKeys.forEach {
             keyPath.add(it.key)
