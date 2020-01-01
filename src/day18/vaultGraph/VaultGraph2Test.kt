@@ -1,145 +1,171 @@
 package day18.vaultGraph
 
-import day18.vault.Entrance
 import day18.vault.Key
 import org.junit.jupiter.api.Test
 import kotlin.test.assertEquals
 
 class VaultGraph2Test {
     @Test
-    fun buildSimpleGraph() {
-        val graph = VaultGraph2(
-            """
-                #####
-                #@.a#
-                #####
-            """.trimIndent()
-        )
-
-        assertEquals(2, graph.size)
-
-        assertEquals(1, graph[Entrance].edges.size)
-        assertEquals(1, graph[Key('a')].edges.size)
-
-        assertEquals(Key('a'), graph[Entrance].edges[0].to.element)
-        assertEquals(Entrance, graph[Key('a')].edges[0].to.element)
-
-        assertEquals(Entrance, graph[Entrance].edges[0].to.edges[0].to.element)
-        assertEquals(Key('a'), graph[Key('a')].edges[0].to.edges[0].to.element)
-    }
-
-    @Test
-    fun simpleDistance() {
-        val graph = VaultGraph2(
-            """
-                #####
-                #@.a#
-                #####
-            """.trimIndent()
-        )
-
-        assertEquals(2, graph[Entrance].edges[0].distance)
-    }
-
-    @Test
-    fun linearGraph() {
+    fun getAvailableKeysFrom() {
         val graph = VaultGraph2(
             """
                 #########
-                #a..@..b#
+                #b...@.a#
                 #########
             """.trimIndent()
         )
 
-        assertEquals(2, graph[Entrance].edges.size)
-        assertEquals(3, graph[Entrance].edges[0].distance)
-        assertEquals(3, graph[Entrance].edges[1].distance)
-        assertEquals(listOf('a', 'b'), graph[Entrance].edges.map { it.to.element.letter }.sorted())
-
-        assertEquals(1, graph[Key('a')].edges.size)
-        assertEquals(3, graph[Key('a')].edges[0].distance)
-        assertEquals(Entrance, graph[Key('a')].edges[0].to.element)
-    }
-
-    @Test
-    fun linearGraphWithSortedDistances() {
-        assertEquals(
-            'b',
-            VaultGraph2(
-                """
-                    ##########
-                    #a...@..b#
-                    ##########
-                """.trimIndent()
-            )[Entrance].edges[0].to.element.letter
+        val keys = graph.getAvailableKeyDistancesFrom(
+            Key('a'),
+            listOf(Key('a'))
         )
+
         assertEquals(
-            'a',
-            VaultGraph2(
-                """
-                    ##########
-                    #a..@...b#
-                    ##########
-                """.trimIndent()
-            )[Entrance].edges[0].to.element.letter
+            listOf(
+                KeyDistance(Key('b'), 6)
+            ),
+            keys
         )
     }
 
     @Test
-    fun linearGraphWithHiddenAccess() {
+    fun getAvailableKeysFrom2() {
         val graph = VaultGraph2(
             """
                 #########
-                #@..a..b#
+                #b.A.@.a#
                 #########
             """.trimIndent()
         )
 
-        assertEquals(1, graph[Entrance].edges.size)
-        assertEquals('a', graph[Entrance].edges[0].to.element.letter)
+        val keys = graph.getAvailableKeyDistancesFrom(
+            Key('a'),
+            listOf(Key('a'))
+        )
+
+        assertEquals(
+            listOf(
+                KeyDistance(Key('b'), 6)
+            ),
+            keys
+        )
     }
 
     @Test
-    fun complexExample() {
-        val graph = VaultGraph2(
+    fun getAvailableKeysFrom3() {
+        val vault = VaultGraph2(
             """
-                #################
-                #h.A..b...c..D.g#
-                ########@########
-                #e.E..a...d..B.f#
-                #################
+                #########
+                #@.a.b.c#
+                #########
             """.trimIndent()
         )
 
-        assertEquals(
-            listOf('a', 'b', 'c', 'd'),
-            graph[Entrance].edges.map { it.to.element.letter }.sorted()
+        val keys = vault.getAvailableKeyDistancesFrom(
+            Key('a'),
+            listOf(Key('a'))
         )
+
         assertEquals(
-            listOf('@', 'A', 'c'),
-            graph[Key('b')].edges.map { it.to.element.letter }.sorted()
+            listOf(
+                KeyDistance(Key('b'), 2)
+            ),
+            keys
         )
     }
 
     @Test
-    fun complexExampleWithSquareInTheMiddle() {
+    fun getAvailableKeysFrom4() {
+        val vault = VaultGraph2(
+            """
+                #########
+                #@.a.b.c#
+                #########
+            """.trimIndent()
+        )
+
+        val keys = vault.getAvailableKeyDistancesFrom(
+            Key('a'),
+            listOf(Key('a'), Key('b'))
+        )
+
+        assertEquals(
+            listOf(
+                KeyDistance(Key('c'), 4)
+            ),
+            keys
+        )
+    }
+
+    @Test
+    fun getAvailableKeysFrom5() {
         val graph = VaultGraph2(
             """
                 #################
                 #h.A..b...c..D.g#
                 #######.@.#######
-                #e.E..a...d..B.f#
+                #...e..a.....B.f#
                 #################
             """.trimIndent()
         )
 
         assertEquals(
-            listOf('a', 'b', 'c', 'd'),
-            graph[Entrance].edges.map { it.to.element.letter }.sorted()
+            listOf(
+                KeyDistance(Key('a'), 3),
+                KeyDistance(Key('c'), 4),
+                KeyDistance(Key('f'), 11)
+            ),
+            graph.getAvailableKeyDistancesFrom(
+                Key('b'),
+                listOf(Key('b'))
+            )
+        )
+    }
+
+    @Test
+    fun getDistancesToKeysFrom() {
+        val graph = VaultGraph2(
+            """
+                #################
+                #h.A..b...c..D.g#
+                #######.@.#######
+                #......a..d..B.f#
+                #################
+            """.trimIndent()
+        )
+
+        assertEquals(
+            listOf(
+                3, // a
+                4, // c
+                5, // h
+                6, // d
+                9, // g
+                11 // f
+            ),
+            graph.getDistancesToKeysFrom(Key('b'))
+        )
+    }
+
+    @Test
+    fun getMaxDistanceToKey() {
+        val graph = VaultGraph2(
+            """
+                #################
+                #h.A..b...c..D.g#
+                #######.@.#######
+                #......a..d..B.f#
+                #################
+            """.trimIndent()
+        )
+
+        assertEquals(
+            11,
+            graph.getMaxDistanceToKey(Key('b'), listOf(Key('b')))
         )
         assertEquals(
-            listOf('@', 'A', 'a', 'c', 'd'),
-            graph[Key('b')].edges.map { it.to.element.letter }.sorted()
+            9,
+            graph.getMaxDistanceToKey(Key('b'), listOf(Key('b'), Key('f')))
         )
     }
 }
