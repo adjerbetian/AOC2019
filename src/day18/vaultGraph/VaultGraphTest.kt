@@ -10,19 +10,19 @@ class VaultGraphTest {
         val graph = VaultGraph(
             """
                 #########
-                #b.A.@.a#
+                #b...@.a#
                 #########
             """.trimIndent()
         )
 
         val keys = graph.getAvailableKeysFrom(
-            Key('@'),
-            listOf(Key('@'))
+            Key('a'),
+            listOf(Key('a'))
         )
 
         assertEquals(
             listOf(
-                KeyDistance(Key('a'), 2)
+                KeyDistance(Key('b'), 6)
             ),
             keys
         )
@@ -40,7 +40,7 @@ class VaultGraphTest {
 
         val keys = graph.getAvailableKeysFrom(
             Key('a'),
-            listOf(Key('@'), Key('a'))
+            listOf(Key('a'))
         )
 
         assertEquals(
@@ -62,13 +62,13 @@ class VaultGraphTest {
         )
 
         val keys = vault.getAvailableKeysFrom(
-            Key('@'),
-            listOf(Key('@'))
+            Key('a'),
+            listOf(Key('a'))
         )
 
         assertEquals(
             listOf(
-                KeyDistance(Key('a'), 2)
+                KeyDistance(Key('b'), 2)
             ),
             keys
         )
@@ -79,7 +79,7 @@ class VaultGraphTest {
         val vault = VaultGraph(
             """
                 #########
-                #a.b.c.@#
+                #@.a.b.c#
                 #########
             """.trimIndent()
         )

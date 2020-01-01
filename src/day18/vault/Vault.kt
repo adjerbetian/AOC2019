@@ -10,6 +10,7 @@ class Vault(textMap: String) {
     operator fun get(position: Position) = map[position]!!
     operator fun get(key: Key) = keyPositions.getValue(key)
     operator fun get(door: Door) = doorPositions.getValue(door)
+    operator fun get(entrance: Entrance) = map.entries.find { it.value == entrance }!!.key
 
     fun getNeighbors(position: Position) = position.getNeighbors().filter { this[it] !is Wall }
 }
@@ -25,9 +26,9 @@ private fun parseKeyMap(textMap: String): HashMap<Position, MapElement> {
             y++
         } else {
             result[Position(x++, y)] = when {
-                c == '.' -> OpenPassage
                 c == '#' -> Wall
-                c == '@' -> Key('@')
+                c == '.' -> Tunnel()
+                c == '@' -> Entrance
                 c.isLetter() && c.isLowerCase() -> Key(c)
                 c.isLetter() && c.isUpperCase() -> Door(c)
                 else -> throw Error("character not recognized: $c")

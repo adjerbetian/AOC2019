@@ -2,16 +2,21 @@ package day18.vault
 
 sealed class MapElement
 object Wall : MapElement()
-object OpenPassage : MapElement()
+open class Tunnel : MapElement()
 
-data class Key(val letter: Char) : MapElement() {
+open class LetterElement(val letter: Char) : Tunnel() {
+    override fun equals(other: Any?) = if (other is LetterElement) letter == other.letter else false
+    override fun toString() = letter.toString()
+    override fun hashCode() = letter.hashCode()
+}
+
+class Key(letter: Char) : LetterElement(letter) {
     fun opens(door: Door) = door.letter.toLowerCase() == letter
     fun getDoor() = Door(letter.toUpperCase())
-
-    override fun toString() = letter.toString()
 }
 
-data class Door(val letter: Char) : MapElement() {
-    override fun toString() = letter.toString()
+class Door(letter: Char) : LetterElement(letter) {
     fun getKey() = Key(letter.toLowerCase())
 }
+
+object Entrance : LetterElement('@')

@@ -14,7 +14,7 @@ internal class VaultTest {
             """.trimIndent()
         )
 
-        assertEquals(Position(5, 1), vault[Key('@')])
+        assertEquals(Position(5, 1), vault[Entrance])
         assertEquals(Position(7, 1), vault[Key('a')])
         assertEquals(Position(1, 1), vault[Key('b')])
     }

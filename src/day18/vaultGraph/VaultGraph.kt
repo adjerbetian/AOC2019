@@ -1,9 +1,6 @@
 package day18.vaultGraph
 
-import day18.vault.Door
-import day18.vault.Key
-import day18.vault.Position
-import day18.vault.Vault
+import day18.vault.*
 
 class VaultGraph(private val vault: Vault) {
     val keys = vault.keys
@@ -53,7 +50,7 @@ class VaultGraph(private val vault: Vault) {
     private fun buildKeyGraphFromEntrance(): KeyGraphNode {
         val edges = mutableListOf<KeyGraphNode>()
         val explored = mutableListOf<Position>()
-        var boundary = listOf(vault[Key('@')])
+        var boundary = listOf(vault[Entrance])
         var distance = 0
 
         while (boundary.isNotEmpty()) {
