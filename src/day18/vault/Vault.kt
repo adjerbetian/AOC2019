@@ -3,7 +3,8 @@ package day18.vault
 class Vault(textMap: String) {
     private val map = parseKeyMap(textMap)
     val keys = map.values.filterIsInstance<Key>()
-    private val doors = map.values.filterIsInstance<Door>()
+    val doors = map.values.filterIsInstance<Door>()
+    val elements = map.values.filterIsInstance<TunnelElement>()
     private val keyPositions = keys.associateWith { key -> map.entries.find { it.value == key }!!.key }
     private val doorPositions = doors.associateWith { door -> map.entries.find { it.value == door }!!.key }
 
@@ -13,6 +14,8 @@ class Vault(textMap: String) {
     operator fun get(entrance: Entrance) = map.entries.find { it.value == entrance }!!.key
 
     fun getNeighbors(position: Position) = position.getNeighbors().filter { this[it] !is Wall }
+
+    fun getNumberOfElements() = keys.size + doors.size + 1
 }
 
 private fun parseKeyMap(textMap: String): HashMap<Position, MapElement> {
