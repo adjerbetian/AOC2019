@@ -5,13 +5,9 @@ class Vault(textMap: String) {
     val keys = map.values.filterIsInstance<Key>()
     val doors = map.values.filterIsInstance<Door>()
     val elements = map.values.filterIsInstance<TunnelElement>()
-    private val keyPositions = keys.associateWith { key -> map.entries.find { it.value == key }!!.key }
-    private val doorPositions = doors.associateWith { door -> map.entries.find { it.value == door }!!.key }
 
     operator fun get(position: Position) = map[position]!!
-    operator fun get(key: Key) = keyPositions.getValue(key)
-    operator fun get(door: Door) = doorPositions.getValue(door)
-    operator fun get(entrance: Entrance) = map.entries.find { it.value == entrance }!!.key
+    operator fun get(element: TunnelElement) = map.entries.find { it.value == element }!!.key
 
     fun getNeighbors(position: Position) = position.getNeighbors().filter { this[it] !is Wall }
 

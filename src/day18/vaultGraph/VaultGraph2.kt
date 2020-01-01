@@ -18,12 +18,11 @@ class VaultGraph2(private val vault: Vault) {
         val mutableNodes = vault.elements.associateWith { MutableNode(it) }
         mutableNodes.values.forEach { node ->
             node.edges.addAll(
-                vault.elements
-                    .filter { it != node.element }
-                    .map { to ->
+                getAccessibleElementsFrom(vault[node.element])
+                    .map {
                         Edge(
-                            mutableNodes.values.find { it.element == to }!!,
-                            2
+                            mutableNodes.getValue(it.first),
+                            it.second
                         )
                     }
             )
@@ -35,5 +34,35 @@ class VaultGraph2(private val vault: Vault) {
     constructor(textMap: String) : this(Vault(textMap))
 
     operator fun get(element: TunnelElement) = nodes.getValue(element)
+
+    private fun getAccessibleElementsFrom(position: Position): List<Pair<TunnelElement, Int>> {
+        val result = mutableListOf<Pair<TunnelElement, Int>>()
+
+        val explored = mutableSetOf<Position>()
+        var boundary = mutableSetOf(position)
+        var distance = 0
+
+        while (boundary.isNotEmpty()) {
+            distance++
+
+            explored.addAll(boundary)
+            boundary = boundary
+                .flatMap { vault.getNeighbors(it) }
+                .filter { !explored.contains(it) }
+                .toMutableSet()
+
+            result.addAll(
+                boundary
+                    .map { vault[it] }
+                    .filterIsInstance<TunnelElement>()
+                    .map { Pair(it, distance) }
+            )
+
+            explored.addAll(boundary.filter { vault[it] is TunnelElement })
+            boundary = boundary.filter { vault[it] !is TunnelElement }.toMutableSet()
+        }
+
+        return result
+    }
 }
 

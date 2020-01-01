@@ -2,7 +2,6 @@ package day18.vaultGraph
 
 import day18.vault.Entrance
 import day18.vault.Key
-import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import kotlin.test.assertEquals
 
@@ -42,7 +41,6 @@ class VaultGraph2Test {
         assertEquals(2, graph[Entrance].edges[0].distance)
     }
 
-    @Disabled
     @Test
     fun linearGraph() {
         val graph = VaultGraph2(
@@ -54,20 +52,19 @@ class VaultGraph2Test {
         )
 
         assertEquals(2, graph[Entrance].edges.size)
-        assertEquals(2, graph[Entrance].edges[0].distance)
-        assertEquals(2, graph[Entrance].edges[1].distance)
+        assertEquals(3, graph[Entrance].edges[0].distance)
+        assertEquals(3, graph[Entrance].edges[1].distance)
         assertEquals(listOf('a', 'b'), graph[Entrance].edges.map { it.to.element.letter }.sorted())
 
         assertEquals(1, graph[Key('a')].edges.size)
-        assertEquals(2, graph[Key('a')].edges[0].distance)
+        assertEquals(3, graph[Key('a')].edges[0].distance)
         assertEquals(Entrance, graph[Key('a')].edges[0].to.element)
     }
 
-    @Disabled
     @Test
     fun linearGraphWithSortedDistances() {
         assertEquals(
-            'a',
+            'b',
             VaultGraph2(
                 """
                     ##########
@@ -77,7 +74,7 @@ class VaultGraph2Test {
             )[Entrance].edges[0].to.element.letter
         )
         assertEquals(
-            'b',
+            'a',
             VaultGraph2(
                 """
                     ##########
@@ -88,18 +85,61 @@ class VaultGraph2Test {
         )
     }
 
-    @Disabled
     @Test
     fun linearGraphWithHiddenAccess() {
         val graph = VaultGraph2(
             """
-                    #########
-                    #@..a..b#
-                    #########
-                """.trimIndent()
+                #########
+                #@..a..b#
+                #########
+            """.trimIndent()
         )
 
         assertEquals(1, graph[Entrance].edges.size)
         assertEquals('a', graph[Entrance].edges[0].to.element.letter)
+    }
+
+    @Test
+    fun complexExample() {
+        val graph = VaultGraph2(
+            """
+                #################
+                #h.A..b...c..D.g#
+                ########@########
+                #e.E..a...d..B.f#
+                #################
+            """.trimIndent()
+        )
+
+        assertEquals(
+            listOf('a', 'b', 'c', 'd'),
+            graph[Entrance].edges.map { it.to.element.letter }.sorted()
+        )
+        assertEquals(
+            listOf('@', 'A', 'c'),
+            graph[Key('b')].edges.map { it.to.element.letter }.sorted()
+        )
+    }
+
+    @Test
+    fun complexExampleWithSquareInTheMiddle() {
+        val graph = VaultGraph2(
+            """
+                #################
+                #h.A..b...c..D.g#
+                #######.@.#######
+                #e.E..a...d..B.f#
+                #################
+            """.trimIndent()
+        )
+
+        assertEquals(
+            listOf('a', 'b', 'c', 'd'),
+            graph[Entrance].edges.map { it.to.element.letter }.sorted()
+        )
+        assertEquals(
+            listOf('@', 'A', 'a', 'c', 'd'),
+            graph[Key('b')].edges.map { it.to.element.letter }.sorted()
+        )
     }
 }
