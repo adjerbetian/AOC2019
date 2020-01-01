@@ -7,17 +7,13 @@ class VaultExplorer(private val graph: VaultGraph) {
     private val progressPrinter = ProgressPrinter(this)
     var bestPathLength = Int.MAX_VALUE
     private var bestPath: List<Key> = emptyList()
-    private val summedDistances: List<Int>
+    private val summedDistances = graph.keys
+        .flatMap { graph.getDistances(it) }
+        .sorted()
+        .subList(0, graph.keys.size)
+        .fold(listOf(0)) { result, distance -> result + (result.last() + distance) }
 
     constructor(textMap: String) : this(VaultGraph(textMap))
-
-    init {
-        summedDistances = graph.getKeyNodes()
-            .flatMap { it.getDistances() }
-            .sorted()
-            .subList(0, graph.keys.size)
-            .fold(listOf(0)) { sum, distance -> sum + (sum.last() + distance) }
-    }
 
     fun getBestKeyPath(): Pair<List<Key>, Int> {
         bestPathLength = Int.MAX_VALUE

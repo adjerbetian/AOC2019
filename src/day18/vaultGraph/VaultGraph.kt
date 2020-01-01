@@ -84,8 +84,7 @@ class VaultGraph(private val vault: Vault) {
         return keysFromKey.getValue(key).getAccessibleKeyDistances(keys).sortedBy { it.distance }
     }
 
-    fun getKeyNodes() = keysFromKey.values
-
     fun getMaxDistance(key: Key, keys: List<Key>) = keysFromKey.getValue(key).getMaxDistance(keys)
+    fun getDistances(key: Key) = keysFromKey.getValue(key).getDistances()
 }
 
