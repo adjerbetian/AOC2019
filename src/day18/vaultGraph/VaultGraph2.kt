@@ -68,7 +68,7 @@ class VaultGraph2(private val vault: Vault) : VaultGraph {
 
     operator fun get(element: TunnelElement) = nodes.getValue(element)
 
-    override fun getAvailableKeyDistancesFrom(element: TunnelElement, keys: List<Key>): List<KeyDistance> {
+    override fun getAvailableKeyDistancesFrom(element: TunnelElement, keys: Set<Key>): List<KeyDistance> {
         val distances = HashMap<TunnelElement, Int>()
 
         fun explore(node: Node, distance: Int) {
@@ -108,7 +108,7 @@ class VaultGraph2(private val vault: Vault) : VaultGraph {
             .sortedBy { it.distance }
     }
 
-    override fun getMaxDistanceToKey(key: Key, keys: List<Key>): Int {
+    override fun getMaxDistanceToKey(key: Key, keys: Set<Key>): Int {
         return distancesToKeys.getValue(key)
             .filter { !keys.contains(it.key) }
             .map { it.distance }

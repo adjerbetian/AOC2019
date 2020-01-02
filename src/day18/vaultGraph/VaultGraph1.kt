@@ -45,7 +45,7 @@ class VaultGraph1(private val vault: Vault) : VaultGraph {
         }
     }
 
-    private fun getAvailableKeysFromEntrance(position: Position, keys: List<Key>): List<KeyDistance> {
+    private fun getAvailableKeysFromEntrance(position: Position, keys: Set<Key>): List<KeyDistance> {
         val newKeys = mutableListOf<KeyDistance>()
         val explored = mutableListOf<Position>()
         var boundary = listOf(position)
@@ -69,7 +69,7 @@ class VaultGraph1(private val vault: Vault) : VaultGraph {
         return newKeys
     }
 
-    private fun getAvailableKeysFromKey(key: Key, keys: List<Key>): List<KeyDistance> {
+    private fun getAvailableKeysFromKey(key: Key, keys: Set<Key>): List<KeyDistance> {
         val doors = keys.map { it.getDoor() }
         return keysFromKey[key]!!
             .filter { !keys.contains(it.first) }
@@ -77,7 +77,7 @@ class VaultGraph1(private val vault: Vault) : VaultGraph {
             .map { KeyDistance(it.first, it.second) }
     }
 
-    override fun getAvailableKeyDistancesFrom(element: TunnelElement, keys: List<Key>): List<KeyDistance> {
+    override fun getAvailableKeyDistancesFrom(element: TunnelElement, keys: Set<Key>): List<KeyDistance> {
         if (element is Key)
             return getAvailableKeysFromKey(element, keys)
         if (element is Entrance)
@@ -85,7 +85,7 @@ class VaultGraph1(private val vault: Vault) : VaultGraph {
         throw Error("not possible")
     }
 
-    override fun getMaxDistanceToKey(key: Key, keys: List<Key>): Int {
+    override fun getMaxDistanceToKey(key: Key, keys: Set<Key>): Int {
         return keysFromKey[key]!!
             .filter { !keys.contains(it.first) }
             .map { it.second }

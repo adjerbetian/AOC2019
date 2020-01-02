@@ -2,6 +2,7 @@ package day18.vaultExplorer
 
 import day18.vault.Entrance
 import day18.vault.Key
+import day18.vault.MapElement
 import day18.vaultGraph.VaultGraph
 import day18.vaultGraph.buildVaultGraph
 
@@ -25,7 +26,7 @@ class VaultExplorer(private val graph: VaultGraph) {
 
     private fun explorePossibleKeyPaths() {
         val keyPath = mutableListOf<Key>()
-        val newKeys = graph.getAvailableKeyDistancesFrom(Entrance, keyPath)
+        val newKeys = graph.getAvailableKeyDistancesFrom(Entrance, keyPath.toSet())
 
         if (newKeys.map { it.key }.toSet().size != newKeys.size) throw Error("not possible")
 
@@ -36,7 +37,12 @@ class VaultExplorer(private val graph: VaultGraph) {
         }
     }
 
-    private fun explorePossibleKeyPaths(keyPath: MutableList<Key>, pathLength: Int) {
+    private fun explorePossibleKeyPaths(
+        keyPath: MutableList<Key>,
+        pathLength: Int
+    ) {
+        val keys = keyPath.toSet()
+
         if (pathLength >= bestPathLength) {
             progressPrinter.trackProgress("Path")
             return
@@ -53,13 +59,13 @@ class VaultExplorer(private val graph: VaultGraph) {
             return
         }
 
-        val maxD = graph.getMaxDistanceToKey(keyPath.last(), keyPath)
+        val maxD = graph.getMaxDistanceToKey(keyPath.last(), keys)
         if (pathLength + maxD >= bestPathLength) {
             progressPrinter.trackProgress("Max D")
             return
         }
 
-        val newKeys = graph.getAvailableKeyDistancesFrom(keyPath.last(), keyPath)
+        val newKeys = graph.getAvailableKeyDistancesFrom(keyPath.last(), keys)
 
         if (newKeys.map { it.key }.toSet().size != newKeys.size) throw Error("not possible")
 

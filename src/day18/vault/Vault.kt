@@ -2,9 +2,9 @@ package day18.vault
 
 class Vault(textMap: String) {
     private val map = parseKeyMap(textMap)
-    val keys = map.values.filterIsInstance<Key>()
-    val doors = map.values.filterIsInstance<Door>()
-    val elements = map.values.filterIsInstance<TunnelElement>()
+    val keys = map.values.filterIsInstance<Key>().toSet()
+    val doors = map.values.filterIsInstance<Door>().toSet()
+    val elements = map.values.filterIsInstance<TunnelElement>().toSet()
 
     operator fun get(position: Position) = map[position]!!
     operator fun get(element: TunnelElement) = map.entries.find { it.value == element }!!.key

@@ -19,7 +19,7 @@ class Key(letter: Char) : TunnelElement(letter) {
 
 class Door(letter: Char) : TunnelElement(letter) {
     fun getKey() = Key(letter.toLowerCase())
-    fun isLocked(keys: List<Key>) = !keys.any { it.opens(this) }
+    fun isLocked(keys: Collection<Key>) = !keys.any { it.opens(this) }
 }
 
 object Entrance : TunnelElement('@')

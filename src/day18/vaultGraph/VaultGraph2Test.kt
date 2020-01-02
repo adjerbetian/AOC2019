@@ -18,7 +18,7 @@ class VaultGraph2Test {
         fun getGraph1() = VaultGraph1(graph.trimIndent())
         fun getGraph2() = VaultGraph2(graph.trimIndent())
         fun getKey() = Key(from)
-        fun getKeys() = visited.split(", ").map { Key(it) }
+        fun getKeys() = visited.split(", ").map { Key(it) }.toSet()
         fun getExpected() = expected.split(", ").map {
             KeyDistance(
                 Key(it.split(": ")[0]),
@@ -146,11 +146,11 @@ class VaultGraph2Test {
 
         assertEquals(
             11,
-            graph.getMaxDistanceToKey(Key('b'), listOf(Key('b')))
+            graph.getMaxDistanceToKey(Key('b'), setOf(Key('b')))
         )
         assertEquals(
             9,
-            graph.getMaxDistanceToKey(Key('b'), listOf(Key('b'), Key('f')))
+            graph.getMaxDistanceToKey(Key('b'), setOf(Key('b'), Key('f')))
         )
     }
 }
