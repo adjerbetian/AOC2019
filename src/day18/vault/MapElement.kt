@@ -11,6 +11,8 @@ open class TunnelElement(val letter: Char) : Tunnel() {
 }
 
 class Key(letter: Char) : TunnelElement(letter) {
+    constructor(letter: String) : this(letter[0])
+
     fun opens(door: Door) = door.letter.toLowerCase() == letter
     fun getDoor() = Door(letter.toUpperCase())
 }

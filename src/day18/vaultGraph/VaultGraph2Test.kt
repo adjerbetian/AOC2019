@@ -1,125 +1,100 @@
 package day18.vaultGraph
 
 import day18.vault.Key
+import org.junit.jupiter.api.DynamicTest
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.TestFactory
 import kotlin.test.assertEquals
 
+
 class VaultGraph2Test {
-    @Test
-    fun getAvailableKeysFrom() {
-        val graph = VaultGraph2(
-            """
+    data class TestCase(
+        val name: String,
+        private val graph: String,
+        private val from: String,
+        private val visited: String,
+        private val expected: String
+    ) {
+        fun getGraph() = VaultGraph2(graph.trimIndent())
+        fun getKey() = Key(from)
+        fun getKeys() = visited.split(", ").map { Key(it) }
+        fun getExpected() = expected.split(", ").map {
+            KeyDistance(
+                Key(it.split(": ")[0]),
+                it.split(": ")[1].toInt()
+            )
+        }
+    }
+
+    private val testCases = listOf(
+        TestCase(
+            name = "simple case",
+            graph = """
                 #########
                 #b...@.a#
                 #########
-            """.trimIndent()
-        )
-
-        val keys = graph.getAvailableKeyDistancesFrom(
-            Key('a'),
-            listOf(Key('a'))
-        )
-
-        assertEquals(
-            listOf(
-                KeyDistance(Key('b'), 6)
-            ),
-            keys
-        )
-    }
-
-    @Test
-    fun getAvailableKeysFrom2() {
-        val graph = VaultGraph2(
-            """
+            """,
+            from = "a",
+            visited = "a",
+            expected = "b: 6"
+        ),
+        TestCase(
+            name = "simple case with a door",
+            graph = """
                 #########
                 #b.A.@.a#
                 #########
-            """.trimIndent()
-        )
-
-        val keys = graph.getAvailableKeyDistancesFrom(
-            Key('a'),
-            listOf(Key('a'))
-        )
-
-        assertEquals(
-            listOf(
-                KeyDistance(Key('b'), 6)
-            ),
-            keys
-        )
-    }
-
-    @Test
-    fun getAvailableKeysFrom3() {
-        val vault = VaultGraph2(
-            """
+            """,
+            from = "a",
+            visited = "a",
+            expected = "b: 6"
+        ),
+        TestCase(
+            name = "simple linear case",
+            graph = """
                 #########
                 #@.a.b.c#
                 #########
-            """.trimIndent()
-        )
-
-        val keys = vault.getAvailableKeyDistancesFrom(
-            Key('a'),
-            listOf(Key('a'))
-        )
-
-        assertEquals(
-            listOf(
-                KeyDistance(Key('b'), 2)
-            ),
-            keys
-        )
-    }
-
-    @Test
-    fun getAvailableKeysFrom4() {
-        val vault = VaultGraph2(
-            """
+            """,
+            from = "a",
+            visited = "a",
+            expected = "b: 2"
+        ),
+        TestCase(
+            name = "simple linear case with more keys",
+            graph = """
                 #########
                 #@.a.b.c#
                 #########
-            """.trimIndent()
-        )
-
-        val keys = vault.getAvailableKeyDistancesFrom(
-            Key('a'),
-            listOf(Key('a'), Key('b'))
-        )
-
-        assertEquals(
-            listOf(
-                KeyDistance(Key('c'), 4)
-            ),
-            keys
-        )
-    }
-
-    @Test
-    fun getAvailableKeysFrom5() {
-        val graph = VaultGraph2(
-            """
+            """,
+            from = "a",
+            visited = "a, b",
+            expected = "c: 4"
+        ),
+        TestCase(
+            name = "complex case",
+            graph = """
                 #################
                 #h.A..b...c..D.g#
                 #######.@.#######
                 #...e..a.....B.f#
                 #################
-            """.trimIndent()
+            """,
+            from = "b",
+            visited = "b",
+            expected = "a: 3, c: 4, f: 11"
         )
+    )
 
-        assertEquals(
-            listOf(
-                KeyDistance(Key('a'), 3),
-                KeyDistance(Key('c'), 4),
-                KeyDistance(Key('f'), 11)
-            ),
-            graph.getAvailableKeyDistancesFrom(
-                Key('b'),
-                listOf(Key('b'))
-            )
-        )
+    @TestFactory
+    fun getAvailableKeysFrom() = testCases.map { testCase ->
+        DynamicTest.dynamicTest(testCase.name) {
+            val graph = testCase.getGraph()
+
+            val keys = graph.getAvailableKeyDistancesFrom(testCase.getKey(), testCase.getKeys())
+
+            assertEquals(testCase.getExpected(), keys)
+        }
     }
 
     @Test
