@@ -1,12 +1,13 @@
 package day18.vaultExplorer
 
 import day18.vault.Key
+import day18.vaultGraph.VaultGraph1
+import day18.vaultGraph.VaultGraph2
 import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import kotlin.test.assertEquals
 
 
-@Disabled
 class VaultExplorerTest {
     @Test
     fun getBestKeyPath() {
@@ -41,7 +42,7 @@ class VaultExplorerTest {
 
         assertEquals(
             Pair(
-                keysOf("@, a, b, c, d, e, f"),
+                keysOf("a, b, c, d, e, f"),
                 86
             ),
             vault.getBestKeyPath()
@@ -62,7 +63,7 @@ class VaultExplorerTest {
 
         assertEquals(
             Pair(
-                keysOf("@, b, a, c, d, f, e, g"),
+                keysOf("b, a, c, d, f, e, g"),
                 132
             ),
             vault.getBestKeyPath()
@@ -73,17 +74,19 @@ class VaultExplorerTest {
     @Test
     fun getBestKeyPath4() {
         val vault = VaultExplorer(
-            """
-                #################
-                #i.G..c...e..H.p#
-                ########.########
-                #j.A..b...f..D.o#
-                ########@########
-                #k.E..a...g..B.n#
-                ########.########
-                #l.F..d...h..C.m#
-                #################
-            """.trimIndent()
+            VaultGraph2(
+                """
+                    #################
+                    #i.G..c...e..H.p#
+                    ########.########
+                    #j.A..b...f..D.o#
+                    ########@########
+                    #k.E..a...g..B.n#
+                    ########.########
+                    #l.F..d...h..C.m#
+                    #################
+                """.trimIndent()
+            )
         )
 
         assertEquals(
@@ -110,7 +113,7 @@ class VaultExplorerTest {
 
         assertEquals(
             Pair(
-                keysOf("@, a, c, f, i, d, g, b, e, h"),
+                keysOf("a, c, f, i, d, g, b, e, h"),
                 81
             ),
             vault.getBestKeyPath()

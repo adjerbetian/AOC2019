@@ -3,30 +3,34 @@ package day18.vaultGraph
 import day18.vault.*
 
 class VaultGraph1(private val vault: Vault) : VaultGraph {
-    override val keys = vault.keys
-    private val keysFromKey = HashMap<Key, KeyGraphNode>()
-
     constructor(textMap: String) : this(Vault(textMap))
 
+    override val keys = vault.keys
+    private val keysFromKey = HashMap<Key, List<Triple<Key, Int, List<Door>>>>()
+    private val minDistanceBetweenKeys: Int
+    private val minDistances: List<Int>
+
     init {
-        vault.keys.forEach { key ->
-            keysFromKey[key] = buildKeyGraph(listOf(vault[key]), emptyList(), 0).first()
+        keys.forEach { key ->
+            keysFromKey[key] = explorePaths(listOf(vault[key]), emptyList())
+                .filter { it.first != key }
+                .sortedBy { it.second }
         }
-        keysFromKey[Key('@')] = buildKeyGraphFromEntrance()
-        keysFromKey.values.forEach {
-            val keys = it.getKeys().sortedBy { k -> k.letter }
-            if (keys.toSet().size != keys.size)
-                throw Error("incorrect for ${it.key}")
-        }
+        minDistanceBetweenKeys = keysFromKey.values.flatten().map { it.second }.min()!!
+        val mutableMinDistancesList =
+            (listOf(0) + keysFromKey.values.flatten().map { it.second }.sorted().subList(
+                0,
+                keys.size
+            )).toMutableList()
+        for (i in 1 until mutableMinDistancesList.size) mutableMinDistancesList[i] += mutableMinDistancesList[i - 1]
+        minDistances = mutableMinDistancesList
     }
 
-    private fun buildKeyGraph(
+    private fun explorePaths(
         path: List<Position>,
-        doors: List<Door>,
-        distance: Int
-    ): List<KeyGraphNode> {
+        doors: List<Door>
+    ): List<Triple<Key, Int, List<Door>>> {
         val last = vault[path.last()]
-
         val newDoors = when (last) {
             is Door -> doors + last
             else -> doors
@@ -35,22 +39,16 @@ class VaultGraph1(private val vault: Vault) : VaultGraph {
         val neighbours = vault.getNeighbors(path.last()).filter { !path.contains(it) }
 
         return if (last is Key) {
-            return listOf(
-                KeyGraphNode(
-                    last,
-                    distance,
-                    doors,
-                    neighbours.flatMap { buildKeyGraph(path + it, emptyList(), distance + 1) })
-            )
+            neighbours.flatMap { explorePaths(path + it, newDoors) } + Triple(last, path.size - 1, doors)
         } else {
-            neighbours.flatMap { buildKeyGraph(path + it, newDoors, distance + 1) }
+            neighbours.flatMap { explorePaths(path + it, newDoors) }
         }
     }
 
-    private fun buildKeyGraphFromEntrance(): KeyGraphNode {
-        val edges = mutableListOf<KeyGraphNode>()
+    private fun getAvailableKeysFromEntrance(position: Position, keys: List<Key>): List<KeyDistance> {
+        val newKeys = mutableListOf<KeyDistance>()
         val explored = mutableListOf<Position>()
-        var boundary = listOf(vault[Entrance])
+        var boundary = listOf(position)
         var distance = 0
 
         while (boundary.isNotEmpty()) {
@@ -59,35 +57,45 @@ class VaultGraph1(private val vault: Vault) : VaultGraph {
             explored.addAll(boundary)
             boundary = boundary
                 .flatMap { vault.getNeighbors(it) }
-                .asSequence()
-                .filter { vault[it] !is Door }
                 .filter { !explored.contains(it) }
-                .toSet()
-                .toList()
-
-            edges.addAll(
+            newKeys.addAll(
                 boundary.map { vault[it] }
-                    .asSequence()
                     .filterIsInstance<Key>()
-                    .map { KeyGraphNode(it, distance) }
+                    .filter { !keys.contains(it) }
+                    .map { KeyDistance(it, distance) }
             )
-
-            boundary = boundary.filter { vault[it] !is Key }
+            boundary = boundary.filter { vault[it] !is Key || keys.contains(vault[it]) }
         }
-        return KeyGraphNode(Key('@'), 0, emptyList(), edges)
+        return newKeys
+    }
+
+    private fun getAvailableKeysFromKey(key: Key, keys: List<Key>): List<KeyDistance> {
+        val doors = keys.map { it.getDoor() }
+        return keysFromKey[key]!!
+            .filter { !keys.contains(it.first) }
+            .filter { doors.containsAll(it.third) }
+            .map { KeyDistance(it.first, it.second) }
     }
 
     override fun getAvailableKeyDistancesFrom(element: TunnelElement, keys: List<Key>): List<KeyDistance> {
-        return this[element].getAccessibleKeyDistances(keys).sortedBy { it.distance }
+        if (element is Key)
+            return getAvailableKeysFromKey(element, keys)
+        if (element is Entrance)
+            return getAvailableKeysFromEntrance(vault[Entrance], keys)
+        throw Error("not possible")
     }
 
-    override fun getMaxDistanceToKey(key: Key, keys: List<Key>) = keysFromKey.getValue(key).getMaxDistance(keys)
-    override fun getDistancesToKeysFrom(element: TunnelElement) = this[element].getDistances()
+    override fun getMaxDistanceToKey(key: Key, keys: List<Key>): Int {
+        return keysFromKey[key]!!
+            .filter { !keys.contains(it.first) }
+            .map { it.second }
+            .max()!!
+    }
 
-    private operator fun get(element: TunnelElement) = keysFromKey.getValue(when (element) {
-        is Key -> element
-        is Entrance -> Key('@')
-        else -> throw Error("not accepted")
-    })
+    override fun getDistancesToKeysFrom(element: TunnelElement): List<Int> {
+        if (element !is Key) throw Error("not supported")
+        return keysFromKey[element]!!.map { it.second }.sorted()
+    }
 }
+
 

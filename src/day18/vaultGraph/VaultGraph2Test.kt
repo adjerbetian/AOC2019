@@ -15,7 +15,8 @@ class VaultGraph2Test {
         private val visited: String,
         private val expected: String
     ) {
-        fun getGraph() = VaultGraph2(graph.trimIndent())
+        fun getGraph1() = VaultGraph1(graph.trimIndent())
+        fun getGraph2() = VaultGraph2(graph.trimIndent())
         fun getKey() = Key(from)
         fun getKeys() = visited.split(", ").map { Key(it) }
         fun getExpected() = expected.split(", ").map {
@@ -87,14 +88,23 @@ class VaultGraph2Test {
     )
 
     @TestFactory
-    fun getAvailableKeysFrom() = testCases.map { testCase ->
-        DynamicTest.dynamicTest(testCase.name) {
-            val graph = testCase.getGraph()
+    fun getAvailableKeysFrom() = testCases.flatMap { testCase ->
+        listOf(
+            DynamicTest.dynamicTest(testCase.name + " - 1") {
+                val graph = testCase.getGraph1()
 
-            val keys = graph.getAvailableKeyDistancesFrom(testCase.getKey(), testCase.getKeys())
+                val keys = graph.getAvailableKeyDistancesFrom(testCase.getKey(), testCase.getKeys())
 
-            assertEquals(testCase.getExpected(), keys)
-        }
+                assertEquals(testCase.getExpected(), keys)
+            },
+            DynamicTest.dynamicTest(testCase.name + " - 2") {
+                val graph = testCase.getGraph2()
+
+                val keys = graph.getAvailableKeyDistancesFrom(testCase.getKey(), testCase.getKeys())
+
+                assertEquals(testCase.getExpected(), keys)
+            }
+        )
     }
 
     @Test

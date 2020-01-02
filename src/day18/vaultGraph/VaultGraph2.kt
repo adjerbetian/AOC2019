@@ -8,13 +8,11 @@ open class Node(val element: TunnelElement, open val edges: List<Edge>) {
 }
 
 class MutableNode(element: TunnelElement, override val edges: MutableList<Edge> = mutableListOf()) :
-    Node(element, edges) {
-    fun toNode() = Node(element, edges)
-}
+    Node(element, edges)
 
 data class Edge(val to: Node, val distance: Int)
 
-class VaultGraph2(private val vault: Vault): VaultGraph {
+class VaultGraph2(private val vault: Vault) : VaultGraph {
     val size = vault.getNumberOfElements()
     override val keys = vault.keys
     private val nodes = buildNodes()
