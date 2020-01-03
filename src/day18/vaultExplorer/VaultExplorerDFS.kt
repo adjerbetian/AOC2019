@@ -27,8 +27,6 @@ class VaultExplorerDFS(private val graph: VaultGraph) : VaultExplorer {
         val keyPath = mutableListOf<Key>()
         val newKeys = graph.getAvailableKeyDistancesFrom(Entrance, keyPath.toSet())
 
-        if (newKeys.map { it.key }.toSet().size != newKeys.size) throw Error("not possible")
-
         newKeys.forEach {
             keyPath.add(it.key)
             explorePossibleKeyPaths(keyPath, it.distance)
@@ -65,8 +63,6 @@ class VaultExplorerDFS(private val graph: VaultGraph) : VaultExplorer {
         }
 
         val newKeys = graph.getAvailableKeyDistancesFrom(keyPath.last(), keys)
-
-        if (newKeys.map { it.key }.toSet().size != newKeys.size) throw Error("not possible")
 
         newKeys.forEach {
             keyPath.add(it.key)
