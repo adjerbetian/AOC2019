@@ -14,12 +14,12 @@ fun main() {
 
 fun runPart1(textMap: String) {
     val vault = Vault(textMap)
-    val graph = VaultGraph2(vault)
+    val graph = VaultGraph1(vault)
     val explorer = VaultExplorer(graph)
     println(explorer.getBestKeyPath())
 
     // == 5102
- }
+}
 
 fun runPart2() {
 }
