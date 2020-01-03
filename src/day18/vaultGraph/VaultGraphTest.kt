@@ -2,30 +2,11 @@ package day18.vaultGraph
 
 import day18.vault.Key
 import org.junit.jupiter.api.DynamicTest
-import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestFactory
 import kotlin.test.assertEquals
 
 
 class VaultGraphTest {
-    data class TestCase(
-        val name: String,
-        private val graph: String,
-        private val from: String,
-        private val visited: String,
-        private val expected: String
-    ) {
-        fun getGraph() = graph.trimIndent()
-        fun getKey() = Key(from)
-        fun getKeys() = visited.split(", ").map { Key(it) }.toSet()
-        fun getExpected() = expected.split(", ").map {
-            KeyDistance(
-                Key(it.split(": ")[0]),
-                it.split(": ")[1].toInt()
-            )
-        }
-    }
-
     private val testCases = listOf(
         TestCase(
             name = "simple case",
@@ -86,16 +67,16 @@ class VaultGraphTest {
         )
     )
 
-    private val graphFactories = hashMapOf(
-        "1" to { textMap: String -> VaultGraph1(textMap) },
-        "2" to { textMap: String -> VaultGraph2(textMap) }
+    private val factories = listOf(
+        Factory("1") { textMap: String -> VaultGraph1(textMap) },
+        Factory("2") { textMap: String -> VaultGraph2(textMap) }
     )
 
     @TestFactory
     fun getAvailableKeysFrom() = testCases.flatMap { testCase ->
-        graphFactories.map {
-            DynamicTest.dynamicTest(testCase.name + " - " + it.key) {
-                val graph = it.value(testCase.getGraph())
+        factories.map {factory ->
+            DynamicTest.dynamicTest(testCase.name + " - " + factory.name) {
+                val graph = factory.function(testCase.getGraph())
 
                 val keys = graph.getAvailableKeyDistancesFrom(testCase.getKey(), testCase.getKeys())
 
@@ -105,9 +86,9 @@ class VaultGraphTest {
     }
 
     @TestFactory
-    fun getDistancesToKeysFrom() = graphFactories.map {
-        DynamicTest.dynamicTest("factory ${it.key}") {
-            val graph = it.value(
+    fun getDistancesToKeysFrom() = factories.map {
+        DynamicTest.dynamicTest("factory ${it.name}") {
+            val graph = it.function(
                 """
                 #################
                 #h.A..b...c..D.g#
@@ -132,9 +113,9 @@ class VaultGraphTest {
     }
 
     @TestFactory
-    fun getMaxDistanceToKey() = graphFactories.map {
-        DynamicTest.dynamicTest("factory ${it.key}") {
-            val graph = it.value(
+    fun getMaxDistanceToKey() = factories.map {
+        DynamicTest.dynamicTest("factory ${it.name}") {
+            val graph = it.function(
                 """
                 #################
                 #h.A..b...c..D.g#
@@ -154,4 +135,24 @@ class VaultGraphTest {
             )
         }
     }
+
+    data class TestCase(
+        val name: String,
+        private val graph: String,
+        private val from: String,
+        private val visited: String,
+        private val expected: String
+    ) {
+        fun getGraph() = graph.trimIndent()
+        fun getKey() = Key(from)
+        fun getKeys() = visited.split(", ").map { Key(it) }.toSet()
+        fun getExpected() = expected.split(", ").map {
+            KeyDistance(
+                Key(it.split(": ")[0]),
+                it.split(": ")[1].toInt()
+            )
+        }
+    }
+
+    data class Factory(val name: String, val function: (map: String) -> VaultGraph)
 }
