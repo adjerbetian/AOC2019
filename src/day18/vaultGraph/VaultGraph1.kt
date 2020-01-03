@@ -6,13 +6,13 @@ class VaultGraph1(private val vault: Vault) : VaultGraph {
     constructor(textMap: String) : this(Vault(textMap))
 
     override val keys = vault.keys
-    private val keysFromKey = HashMap<Key, List<Triple<Key, Int, List<Door>>>>()
+    private val keysFromKey = HashMap<Key, List<Triple<Key, Int, Pair<List<Door>, List<Key>>>>>()
     private val minDistanceBetweenKeys: Int
     private val minDistances: List<Int>
 
     init {
         keys.forEach { key ->
-            keysFromKey[key] = explorePaths(listOf(vault[key]), emptyList())
+            keysFromKey[key] = explorePaths(listOf(vault[key]), emptyList(), emptyList())
                 .filter { it.first != key }
                 .sortedBy { it.second }
         }
@@ -28,20 +28,29 @@ class VaultGraph1(private val vault: Vault) : VaultGraph {
 
     private fun explorePaths(
         path: List<Position>,
-        doors: List<Door>
-    ): List<Triple<Key, Int, List<Door>>> {
+        doors: List<Door>,
+        keys: List<Key>
+    ): List<Triple<Key, Int, Pair<List<Door>, List<Key>>>> {
         val last = vault[path.last()]
         val newDoors = when (last) {
             is Door -> doors + last
             else -> doors
         }
+        val newKeys = when (last) {
+            is Key -> keys + last
+            else -> keys
+        }
 
         val neighbours = vault.getNeighbors(path.last()).filter { !path.contains(it) }
 
         return if (last is Key) {
-            neighbours.flatMap { explorePaths(path + it, newDoors) } + Triple(last, path.size - 1, doors)
+            neighbours.flatMap { explorePaths(path + it, newDoors, newKeys) } + Triple(
+                last,
+                path.size - 1,
+                Pair(doors, keys)
+            )
         } else {
-            neighbours.flatMap { explorePaths(path + it, newDoors) }
+            neighbours.flatMap { explorePaths(path + it, newDoors, newKeys) }
         }
     }
 
@@ -67,14 +76,21 @@ class VaultGraph1(private val vault: Vault) : VaultGraph {
             boundary = boundary.filter { vault[it] !is Key || keys.contains(vault[it]) }
         }
         return newKeys
+            .groupBy { it.key }
+            .map { it.value.minBy { d -> d.distance }!! }
     }
 
     private fun getAvailableKeysFromKey(key: Key, keys: Set<Key>): List<KeyDistance> {
         val doors = keys.map { it.getDoor() }
         return keysFromKey[key]!!
+            .asSequence()
             .filter { !keys.contains(it.first) }
-            .filter { doors.containsAll(it.third) }
+            .filter { keys.containsAll(it.third.second) }
+            .filter { doors.containsAll(it.third.first) }
             .map { KeyDistance(it.first, it.second) }
+            .groupBy { it.key }
+            .map { it.value.minBy { d -> d.distance }!! }
+            .toList()
     }
 
     override fun getAvailableKeyDistancesFrom(element: TunnelElement, keys: Set<Key>): List<KeyDistance> {
@@ -94,7 +110,11 @@ class VaultGraph1(private val vault: Vault) : VaultGraph {
 
     override fun getDistancesToKeysFrom(element: TunnelElement): List<Int> {
         if (element !is Key) throw Error("not supported")
-        return keysFromKey[element]!!.map { it.second }.sorted()
+        return keysFromKey[element]!!
+            .groupBy { it.first }
+            .map { it.value.minBy { d -> d.second }!! }
+            .map { it.second }
+            .sorted()
     }
 }
 

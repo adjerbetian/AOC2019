@@ -1,6 +1,9 @@
 package day18
 
+import day18.vault.Vault
 import day18.vaultExplorer.VaultExplorer
+import day18.vaultGraph.VaultGraph1
+import day18.vaultGraph.VaultGraph2
 import java.io.File
 
 fun main() {
@@ -10,8 +13,10 @@ fun main() {
 }
 
 fun runPart1(textMap: String) {
-    val vault = VaultExplorer(textMap)
-    println(vault.getBestKeyPath())
+    val vault = Vault(textMap)
+    val graph = VaultGraph2(vault)
+    val explorer = VaultExplorer(graph)
+    println(explorer.getBestKeyPath())
 
     // == 5102
  }
