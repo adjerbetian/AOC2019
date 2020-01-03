@@ -103,7 +103,10 @@ class VaultGraph1(private val vault: Vault) : VaultGraph {
 
     override fun getMaxDistanceToKey(key: Key, keys: Set<Key>): Int {
         return keysFromKey[key]!!
+            .asSequence()
             .filter { !keys.contains(it.first) }
+            .groupBy { it.first }
+            .map { it.value.minBy { d -> d.second }!! }
             .map { it.second }
             .max()!!
     }
@@ -111,6 +114,7 @@ class VaultGraph1(private val vault: Vault) : VaultGraph {
     override fun getDistancesToKeysFrom(element: TunnelElement): List<Int> {
         if (element !is Key) throw Error("not supported")
         return keysFromKey[element]!!
+            .asSequence()
             .groupBy { it.first }
             .map { it.value.minBy { d -> d.second }!! }
             .map { it.second }

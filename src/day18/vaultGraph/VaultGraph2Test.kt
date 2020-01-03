@@ -15,8 +15,7 @@ class VaultGraph2Test {
         private val visited: String,
         private val expected: String
     ) {
-        fun getGraph1() = VaultGraph1(graph.trimIndent())
-        fun getGraph2() = VaultGraph2(graph.trimIndent())
+        fun getGraph() = graph.trimIndent()
         fun getKey() = Key(from)
         fun getKeys() = visited.split(", ").map { Key(it) }.toSet()
         fun getExpected() = expected.split(", ").map {
@@ -87,70 +86,72 @@ class VaultGraph2Test {
         )
     )
 
+    private val graphFactories = hashMapOf(
+        "1" to { textMap: String -> VaultGraph1(textMap) },
+        "2" to { textMap: String -> VaultGraph2(textMap) }
+    )
+
     @TestFactory
     fun getAvailableKeysFrom() = testCases.flatMap { testCase ->
-        listOf(
-            DynamicTest.dynamicTest(testCase.name + " - 1") {
-                val graph = testCase.getGraph1()
-
-                val keys = graph.getAvailableKeyDistancesFrom(testCase.getKey(), testCase.getKeys())
-
-                assertEquals(testCase.getExpected(), keys)
-            },
-            DynamicTest.dynamicTest(testCase.name + " - 2") {
-                val graph = testCase.getGraph2()
+        graphFactories.map {
+            DynamicTest.dynamicTest(testCase.name + " - " + it.key) {
+                val graph = it.value(testCase.getGraph())
 
                 val keys = graph.getAvailableKeyDistancesFrom(testCase.getKey(), testCase.getKeys())
 
                 assertEquals(testCase.getExpected(), keys)
             }
-        )
+        }
     }
 
-    @Test
-    fun getDistancesToKeysFrom() {
-        val graph = VaultGraph2(
-            """
+    @TestFactory
+    fun getDistancesToKeysFrom() = graphFactories.map {
+        DynamicTest.dynamicTest("factory ${it.key}") {
+            val graph = it.value(
+                """
                 #################
                 #h.A..b...c..D.g#
                 #######.@.#######
                 #......a..d..B.f#
                 #################
             """.trimIndent()
-        )
+            )
 
-        assertEquals(
-            listOf(
-                3, // a
-                4, // c
-                5, // h
-                6, // d
-                9, // g
-                11 // f
-            ),
-            graph.getDistancesToKeysFrom(Key('b'))
-        )
+            assertEquals(
+                listOf(
+                    3, // a
+                    4, // c
+                    5, // h
+                    6, // d
+                    9, // g
+                    11 // f
+                ),
+                graph.getDistancesToKeysFrom(Key('b'))
+            )
+        }
     }
 
-    @Test
-    fun getMaxDistanceToKey() {
-        val graph = VaultGraph2(
-            """
+    @TestFactory
+    fun getMaxDistanceToKey() = graphFactories.map {
+        DynamicTest.dynamicTest("factory ${it.key}") {
+            val graph = it.value(
+                """
                 #################
                 #h.A..b...c..D.g#
                 #######.@.#######
                 #......a..d..B.f#
                 #################
             """.trimIndent()
-        )
+            )
 
-        assertEquals(
-            11,
-            graph.getMaxDistanceToKey(Key('b'), setOf(Key('b')))
-        )
-        assertEquals(
-            9,
-            graph.getMaxDistanceToKey(Key('b'), setOf(Key('b'), Key('f')))
-        )
+            assertEquals(
+                11,
+                graph.getMaxDistanceToKey(Key('b'), setOf(Key('b')))
+            )
+            assertEquals(
+                9,
+                graph.getMaxDistanceToKey(Key('b'), setOf(Key('b'), Key('f')))
+            )
+        }
     }
 }
