@@ -1,7 +1,6 @@
 package day18.vaultExplorer
 
 import day18.vault.Key
-import day18.vaultGraph.VaultGraph1
 import day18.vaultGraph.VaultGraph2
 import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
@@ -11,7 +10,7 @@ import kotlin.test.assertEquals
 class VaultExplorerTest {
     @Test
     fun getBestKeyPath() {
-        val vault = VaultExplorer(
+        val vault = VaultExplorerDFS(
             """
                 #########
                 #b.A.@.a#
@@ -30,7 +29,7 @@ class VaultExplorerTest {
 
     @Test
     fun getBestKeyPath2() {
-        val vault = VaultExplorer(
+        val vault = VaultExplorerDFS(
             """
                 ########################
                 #f.D.E.e.C.b.A.@.a.B.c.#
@@ -51,7 +50,7 @@ class VaultExplorerTest {
 
     @Test
     fun getBestKeyPath3() {
-        val vault = VaultExplorer(
+        val vault = VaultExplorerDFS(
             """
                 ########################
                 #...............b.C.D.f#
@@ -73,7 +72,7 @@ class VaultExplorerTest {
     @Disabled
     @Test
     fun getBestKeyPath4() {
-        val vault = VaultExplorer(
+        val vault = VaultExplorerDFS(
             VaultGraph2(
                 """
                     #################
@@ -100,7 +99,7 @@ class VaultExplorerTest {
 
     @Test
     fun getBestKeyPath5() {
-        val vault = VaultExplorer(
+        val vault = VaultExplorerDFS(
             """
                 ########################
                 #@..............ac.GI.b#
