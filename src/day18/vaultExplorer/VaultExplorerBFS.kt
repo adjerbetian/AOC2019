@@ -14,8 +14,9 @@ class VaultExplorerBFS(private val graph: VaultGraph, private val size: Int) : V
 
         for (i in 1 until graph.keys.size) {
             keyPaths = keyPaths.flatMap { explorePossibleKeyPaths(it.first, it.second) }
-                .sortedBy { it.second }
+                .sortedBy { it.second + graph.getMaxDistanceToKey(it.first.last(), it.first.toSet()) }
                 .take(size)
+            println("$i / ${graph.keys.size}")
         }
         return keyPaths.first()
     }

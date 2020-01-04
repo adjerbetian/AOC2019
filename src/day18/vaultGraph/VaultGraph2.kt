@@ -112,7 +112,7 @@ class VaultGraph2(private val vault: Vault) : VaultGraph {
         return distancesToKeys.getValue(key)
             .filter { !keys.contains(it.key) }
             .map { it.distance }
-            .max()!!
+            .max() ?: 0
     }
 
     override fun getDistancesToKeysFrom(element: TunnelElement): List<Int> {

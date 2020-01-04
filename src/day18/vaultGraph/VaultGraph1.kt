@@ -108,7 +108,7 @@ class VaultGraph1(private val vault: Vault) : VaultGraph {
             .groupBy { it.first }
             .map { it.value.minBy { d -> d.second }!! }
             .map { it.second }
-            .max()!!
+            .max() ?: 0
     }
 
     override fun getDistancesToKeysFrom(element: TunnelElement): List<Int> {
