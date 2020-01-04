@@ -5,10 +5,12 @@ import day18.vaultExplorer.VaultExplorerBFS
 import day18.vaultExplorer.VaultExplorerDFS
 import day18.vaultGraph.VaultGraphImpl
 import java.io.File
+import java.time.Duration
 
 fun main() {
     val textMap = readInput("src/day18/input.txt")
-    runPart1_BFS(textMap) // == 5102
+//    runPart1_BFS(textMap) // == 5102
+    runPart1_DFS(textMap) // == 5102
     runPart2()
 }
 
@@ -22,7 +24,7 @@ fun runPart1_BFS(textMap: String) {
 fun runPart1_DFS(textMap: String) {
     val vault = Vault(textMap)
     val graph = VaultGraphImpl(vault)
-    val explorer = VaultExplorerDFS(graph)
+    val explorer = VaultExplorerDFS(graph, Duration.ofSeconds(30))
     println(explorer.getBestKeyPath())
 }
 

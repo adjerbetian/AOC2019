@@ -4,21 +4,26 @@ import day18.vault.Entrance
 import day18.vault.Key
 import day18.vaultGraph.VaultGraph
 import day18.vaultGraph.buildVaultGraph
+import java.time.Duration
+import java.time.Instant
 
-class VaultExplorerDFS(private val graph: VaultGraph) : VaultExplorer {
+class VaultExplorerDFS(private val graph: VaultGraph, val maxDuration: Duration) : VaultExplorer {
     private val progressPrinter = ProgressPrinter(this)
     var bestPathLength = Int.MAX_VALUE
     private var bestPath: List<Key> = emptyList()
+    var start: Instant = Instant.now()
     private val summedDistances = graph.keys
         .flatMap { graph.getDistancesToKeysFrom(it) }
         .sorted()
         .subList(0, graph.keys.size)
         .fold(listOf(0)) { result, distance -> result + (result.last() + distance) }
 
-    constructor(textMap: String) : this(buildVaultGraph(textMap))
+    constructor(textMap: String, maxTime: Duration) : this(buildVaultGraph(textMap), maxTime)
 
     override fun getBestKeyPath(): Pair<List<Key>, Int> {
         bestPathLength = Int.MAX_VALUE
+        start = Instant.now()
+
         explorePossibleKeyPaths()
         return Pair(bestPath, bestPathLength)
     }
@@ -38,6 +43,8 @@ class VaultExplorerDFS(private val graph: VaultGraph) : VaultExplorer {
         keyPath: MutableList<Key>,
         pathLength: Int
     ) {
+        if (Duration.between(start, Instant.now()) > maxDuration) return
+
         val keys = keyPath.toSet()
 
         if (pathLength >= bestPathLength) {
@@ -51,14 +58,14 @@ class VaultExplorerDFS(private val graph: VaultGraph) : VaultExplorer {
             println("\nfound key path of length $bestPathLength : $bestPath")
         }
 
-        if (pathLength + summedDistances[graph.keys.size - keyPath.size] >= bestPathLength) {
-            progressPrinter.trackProgress("Min D")
-            return
-        }
-
         val maxD = graph.getMaxDistanceToKey(keyPath.last(), keys)
         if (pathLength + maxD >= bestPathLength) {
             progressPrinter.trackProgress("Max D")
+            return
+        }
+
+        if (pathLength + summedDistances[graph.keys.size - keyPath.size] >= bestPathLength) {
+            progressPrinter.trackProgress("Min D")
             return
         }
 

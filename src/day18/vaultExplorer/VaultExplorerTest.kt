@@ -5,12 +5,13 @@ import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.DynamicTest
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestFactory
+import java.time.Duration
 import kotlin.test.assertEquals
 
 
 class VaultExplorerTest {
     private val factories = listOf(
-        Factory("DFS") { map -> VaultExplorerDFS(map) },
+        Factory("DFS") { map -> VaultExplorerDFS(map, Duration.ofSeconds(1)) },
         Factory("BFS") { map -> VaultExplorerBFS(map, 100) }
     )
 
@@ -81,7 +82,7 @@ class VaultExplorerTest {
 
     @Disabled // works but is too long
     @Test
-    fun trickyComplexCase() {
+    fun trickyComplexCaseBFS() {
         val explorer = VaultExplorerBFS(
             """
                 #################
@@ -95,6 +96,27 @@ class VaultExplorerTest {
                 #################
             """.trimIndent(),
             100000
+        )
+
+        assertEquals(136, explorer.getBestKeyPath().second)
+    }
+
+    @Disabled // works but is too long
+    @Test
+    fun trickyComplexCaseDFS() {
+        val explorer = VaultExplorerDFS(
+            """
+                #################
+                #i.G..c...e..H.p#
+                ########.########
+                #j.A..b...f..D.o#
+                ########@########
+                #k.E..a...g..B.n#
+                ########.########
+                #l.F..d...h..C.m#
+                #################
+            """.trimIndent(),
+            Duration.ofSeconds(20)
         )
 
         assertEquals(136, explorer.getBestKeyPath().second)

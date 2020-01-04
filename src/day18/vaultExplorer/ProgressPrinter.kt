@@ -1,11 +1,11 @@
 package day18.vaultExplorer
 
-import java.util.*
-import kotlin.collections.HashMap
+import java.time.Duration
+import java.time.Instant
 
-class ProgressPrinter(private val graph: VaultExplorerDFS) {
-    private val LOG_INTERVAL = 10000
-    private var lastLog = Date().time
+class ProgressPrinter(private val explorerDFS: VaultExplorerDFS) {
+    private val LOG_INTERVAL = Duration.ofSeconds(10)
+    private var lastLog = Instant.now()
     private val counters = HashMap<String, Long>()
 
     fun trackProgress(type: String) {
@@ -14,11 +14,15 @@ class ProgressPrinter(private val graph: VaultExplorerDFS) {
     }
 
     private fun printProgress() {
-        if (Date().time - lastLog > LOG_INTERVAL) {
+        if (Duration.between(lastLog, Instant.now()) > LOG_INTERVAL) {
+            val remainingTime = explorerDFS.maxDuration - Duration.between(explorerDFS.start, Instant.now())
+
             counters.entries.forEach { println("${it.key} : ${prettyInt(it.value)}") }
-            println("best path length: ${graph.bestPathLength}")
+            println("best path length: ${explorerDFS.bestPathLength}")
+            println("Remaining: ${remainingTime.seconds}s")
             println("---")
-            lastLog = Date().time
+
+            lastLog = Instant.now()
         }
     }
 
