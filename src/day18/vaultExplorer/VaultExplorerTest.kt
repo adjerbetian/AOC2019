@@ -1,14 +1,17 @@
 package day18.vaultExplorer
 
 import day18.vault.Key
+import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.DynamicTest
+import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestFactory
 import kotlin.test.assertEquals
 
 
 class VaultExplorerTest {
     private val factories = listOf(
-        Factory("DFS") { map: String -> VaultExplorerDFS(map) }
+        Factory("DFS") { map -> VaultExplorerDFS(map) },
+        Factory("BFS") { map -> VaultExplorerBFS(map, 100) }
     )
 
     private val testCases = listOf(
@@ -49,23 +52,6 @@ class VaultExplorerTest {
         TestCase(
             "simple one",
             """
-                #################
-                #i.G..c...e..H.p#
-                ########.########
-                #j.A..b...f..D.o#
-                ########@########
-                #k.E..a...g..B.n#
-                ########.########
-                #l.F..d...h..C.m#
-                #################
-            """,
-            136,
-            "a, f, b, j, g, n, h, d, l, o, e, p, c, i, k, m",
-            true
-        ),
-        TestCase(
-            "simple one",
-            """
                 ########################
                 #@..............ac.GI.b#
                 ###d#e#f################
@@ -79,25 +65,47 @@ class VaultExplorerTest {
     )
 
     @TestFactory
-    fun getBestKeyPath() = testCases.filter { !it.skip }.flatMap { test ->
+    fun getBestKeyPath() = testCases.flatMap { test ->
         factories.map { factory ->
             DynamicTest.dynamicTest(test.name + " - " + factory.name) {
                 val explorer = factory.function(test.getGraph())
 
-                assertEquals(test.getExpected(), explorer.getBestKeyPath())
+                assertEquals(test.getExpectedPath(), explorer.getBestKeyPath().first)
+                assertEquals(test.getExpectedDistance(), explorer.getBestKeyPath().second)
             }
         }
+    }
+
+    @Disabled // works but is too long
+    @Test
+    fun trickyComplexCase() {
+        val explorer = VaultExplorerBFS(
+            """
+                #################
+                #i.G..c...e..H.p#
+                ########.########
+                #j.A..b...f..D.o#
+                ########@########
+                #k.E..a...g..B.n#
+                ########.########
+                #l.F..d...h..C.m#
+                #################
+            """.trimIndent(),
+            100000
+        )
+
+        assertEquals(136, explorer.getBestKeyPath().second)
     }
 
     data class TestCase(
         val name: String,
         private val graph: String,
         private val distance: Int,
-        private val path: String,
-        val skip: Boolean = false
+        private val path: String
     ) {
         fun getGraph() = graph.trimIndent()
-        fun getExpected() = Pair(keysOf(path), distance)
+        fun getExpectedDistance() = distance
+        fun getExpectedPath() = keysOf(path)
 
         private fun keysOf(keys: String) =
             keys.split(", ")

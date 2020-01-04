@@ -7,7 +7,7 @@ import day18.vaultGraph.buildVaultGraph
 
 class VaultExplorerDFS(private val graph: VaultGraph) : VaultExplorer {
     private val progressPrinter = ProgressPrinter(this)
-    override var bestPathLength = Int.MAX_VALUE
+    var bestPathLength = Int.MAX_VALUE
     private var bestPath: List<Key> = emptyList()
     private val summedDistances = graph.keys
         .flatMap { graph.getDistancesToKeysFrom(it) }
