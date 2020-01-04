@@ -5,10 +5,10 @@ import day18.vault.Key
 import org.junit.jupiter.api.Test
 import kotlin.test.assertEquals
 
-class VaultGraph2Test {
+class VaultGraphImplTest {
     @Test
     fun buildSimpleGraph() {
-        val graph = VaultGraph2(
+        val graph = VaultGraphImpl(
             """
                 #####
                 #@.a#
@@ -30,7 +30,7 @@ class VaultGraph2Test {
 
     @Test
     fun simpleDistance() {
-        val graph = VaultGraph2(
+        val graph = VaultGraphImpl(
             """
                 #####
                 #@.a#
@@ -43,7 +43,7 @@ class VaultGraph2Test {
 
     @Test
     fun linearGraph() {
-        val graph = VaultGraph2(
+        val graph = VaultGraphImpl(
             """
                 #########
                 #a..@..b#
@@ -65,7 +65,7 @@ class VaultGraph2Test {
     fun linearGraphWithSortedDistances() {
         assertEquals(
             'b',
-            VaultGraph2(
+            VaultGraphImpl(
                 """
                     ##########
                     #a...@..b#
@@ -75,7 +75,7 @@ class VaultGraph2Test {
         )
         assertEquals(
             'a',
-            VaultGraph2(
+            VaultGraphImpl(
                 """
                     ##########
                     #a..@...b#
@@ -87,7 +87,7 @@ class VaultGraph2Test {
 
     @Test
     fun linearGraphWithHiddenAccess() {
-        val graph = VaultGraph2(
+        val graph = VaultGraphImpl(
             """
                 #########
                 #@..a..b#
@@ -101,7 +101,7 @@ class VaultGraph2Test {
 
     @Test
     fun complexExample() {
-        val graph = VaultGraph2(
+        val graph = VaultGraphImpl(
             """
                 #################
                 #h.A..b...c..D.g#
@@ -123,7 +123,7 @@ class VaultGraph2Test {
 
     @Test
     fun complexExampleWithSquareInTheMiddle() {
-        val graph = VaultGraph2(
+        val graph = VaultGraphImpl(
             """
                 #################
                 #h.A..b...c..D.g#

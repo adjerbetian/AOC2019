@@ -10,5 +10,4 @@ interface VaultGraph {
     fun getDistancesToKeysFrom(element: TunnelElement): List<Int>
 }
 
-fun buildVaultGraph(textMap: String): VaultGraph = VaultGraph2(textMap)
-//fun buildVaultGraph(textMap: String): VaultGraph = VaultGraph1(textMap)
+fun buildVaultGraph(textMap: String): VaultGraph = VaultGraphImpl(textMap)
