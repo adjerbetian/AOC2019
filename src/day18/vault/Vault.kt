@@ -6,36 +6,30 @@ class Vault(textMap: String) {
     val doors = map.values.filterIsInstance<Door>().toSet()
     val elements = map.values.filterIsInstance<TunnelElement>().toSet()
 
-    operator fun get(position: Position) = map[position]!!
+    operator fun get(position: Position) = map.getValue(position)
     operator fun get(element: TunnelElement) = map.entries.find { it.value == element }!!.key
 
     fun getNeighbors(position: Position) = position.getNeighbors().filter { this[it] !is Wall }
-
     fun getNumberOfElements() = keys.size + doors.size + 1
 }
 
-private fun parseKeyMap(textMap: String): HashMap<Position, MapElement> {
-    val result = HashMap<Position, MapElement>()
-
-    var x = 0
-    var y = 0
-    for (c in textMap) {
-        if (c == '\n') {
-            x = 0
-            y++
-        } else {
-            result[Position(x++, y)] = when {
-                c == '#' -> Wall
-                c == '.' -> Tunnel()
-                c == '@' -> Entrance
-                c.isLetter() && c.isLowerCase() -> Key(c)
-                c.isLetter() && c.isUpperCase() -> Door(c)
-                else -> throw Error("character not recognized: $c")
-            }
+private fun parseKeyMap(textMap: String): Map<Position, MapElement> {
+    return textMap
+        .split("\n")
+        .mapIndexed { y, row ->
+            row.mapIndexed { x, c -> Pair(Position(x, y), parseChar(c)) }
         }
-    }
+        .flatten()
+        .associate { it }
+}
 
-    return result
+private fun parseChar(c: Char) = when {
+    c == '#' -> Wall
+    c == '.' -> Tunnel
+    c == '@' -> Entrance
+    c.isLetter() && c.isLowerCase() -> Key(c)
+    c.isLetter() && c.isUpperCase() -> Door(c)
+    else -> throw Error("character not recognized: $c")
 }
 
 

@@ -2,9 +2,9 @@ package day18.vault
 
 sealed class MapElement
 object Wall : MapElement()
-open class Tunnel : MapElement()
+object Tunnel : MapElement()
 
-open class TunnelElement(val letter: Char) : Tunnel() {
+sealed class TunnelElement(val letter: Char): MapElement() {
     override fun equals(other: Any?) = if (other is TunnelElement) letter == other.letter else false
     override fun toString() = letter.toString()
     override fun hashCode() = letter.hashCode()
