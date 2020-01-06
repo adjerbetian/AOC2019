@@ -6,33 +6,26 @@ import day18.vaultExplorer.VaultExplorerBFS
 import day18.vaultExplorer.VaultExplorerDFS
 import day18.vaultGraph.VaultGraphImpl
 import java.io.File
-import java.time.Duration
 
 fun main() {
-    runPart1_DFS() // == 5102
-    runPart1_BFS() // == 5102
+    runPart1_DFS()
+    runPart1_BFS()
 //    runPart2()
 }
 
 private fun runPart1_DFS() {
-    val textMap = readInput("src/day18/input-part1.txt")
-    val vault = Vault(textMap)
-    val graph = VaultGraphImpl(vault)
-    val explorer = VaultExplorerDFS(graph)
-
+    val explorer = VaultExplorerDFS(buildGraph())
     val (path, length) = explorer.getBestKeyPath()
     println("DFS - The best length is $length for the path $path")
 }
 
 private fun runPart1_BFS() {
-    val textMap = readInput("src/day18/input-part1.txt")
-    val vault = Vault(textMap)
-    val graph = VaultGraphImpl(vault)
-    val explorer = VaultExplorerBFS(graph)
-
+    val explorer = VaultExplorerBFS(buildGraph())
     val (path, length) = explorer.getBestKeyPath()
     println("BFS - The best length is $length for the path $path")
 }
+
+private fun buildGraph() = VaultGraphImpl(Vault(readInput("src/day18/input-part1.txt")))
 
 private fun runPart2() {
     val textMap = readInput("src/day18/input-part2.txt")
