@@ -101,7 +101,6 @@ class VaultExplorerTest {
         assertEquals(136, explorer.getBestKeyPath().second)
     }
 
-    @Disabled // works but is too long
     @Test
     fun trickyComplexCaseDFS() {
         val explorer = VaultExplorerDFS(

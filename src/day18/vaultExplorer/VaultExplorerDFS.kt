@@ -17,12 +17,14 @@ class VaultExplorerDFS(private val graph: VaultGraph, val maxDuration: Duration)
         .sorted()
         .subList(0, graph.keys.size)
         .fold(listOf(0)) { result, distance -> result + (result.last() + distance) }
+    private var pathMemory = HashMap<String, Int>()
 
     constructor(textMap: String, maxTime: Duration) : this(buildVaultGraph(textMap), maxTime)
 
     override fun getBestKeyPath(): Pair<List<Key>, Int> {
         bestPathLength = Int.MAX_VALUE
         start = Instant.now()
+        pathMemory = HashMap()
 
         explorePossibleKeyPaths()
         return Pair(bestPath, bestPathLength)
@@ -43,6 +45,14 @@ class VaultExplorerDFS(private val graph: VaultGraph, val maxDuration: Duration)
         keyPath: MutableList<Key>,
         pathLength: Int
     ) {
+        fun getPathMemoryHash() = keyPath.last().letter + "." + keyPath.map { it }.sortedBy { it.letter }.joinToString("")
+
+        if (pathMemory[getPathMemoryHash()] ?: Int.MAX_VALUE <= pathLength) {
+            progressPrinter.trackProgress("KeyCut")
+            return
+        }
+        pathMemory[getPathMemoryHash()] = pathLength
+
         if (Duration.between(start, Instant.now()) > maxDuration) return
 
         val keys = keyPath.toSet()
