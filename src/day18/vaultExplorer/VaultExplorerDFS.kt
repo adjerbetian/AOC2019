@@ -15,8 +15,10 @@ class VaultExplorerDFS(private val graph: VaultGraph) : VaultExplorer {
     override fun getBestKeyPath(): Pair<List<Key>, Int> {
         bestPathLength = Int.MAX_VALUE
         pathMemory = KeyPathMemory()
+        bestPath = emptyList()
 
         explorePossibleKeyPaths()
+
         return Pair(bestPath, bestPathLength)
     }
 
@@ -35,20 +37,16 @@ class VaultExplorerDFS(private val graph: VaultGraph) : VaultExplorer {
         if (pathMemory[keyPath] <= pathLength) return
         pathMemory[keyPath] = pathLength
 
-        if (pathLength >= bestPathLength) return
+        if (pathLength + getMinRemainingDistance(keyPath) >= bestPathLength) return
 
         if (keyPath.size == graph.keys.size) {
             bestPathLength = pathLength
             bestPath = keyPath.map { it }
             println("\nfound key path of length $bestPathLength : $bestPath")
+            return
         }
 
-        val maxD = graph.getMaxDistanceToKey(keyPath.last(), keyPath.toSet())
-        if (pathLength + maxD >= bestPathLength) return
-
-        val newKeys = graph.getAvailableKeyDistancesFrom(keyPath.last(), keyPath.toSet())
-
-        newKeys.forEach {
+        getNextKeys(keyPath).forEach {
             keyPath.add(it.key)
             explorePossibleKeyPaths(
                 keyPath,
@@ -57,6 +55,9 @@ class VaultExplorerDFS(private val graph: VaultGraph) : VaultExplorer {
             keyPath.removeAt(keyPath.lastIndex)
         }
     }
+
+    private fun getMinRemainingDistance(keyPath: List<Key>) = graph.getMaxDistanceToKey(keyPath.last(), keyPath.toSet())
+    private fun getNextKeys(keyPath: List<Key>) = graph.getAvailableKeyDistancesFrom(keyPath.last(), keyPath.toSet())
 }
 
 private class KeyPathMemory {
