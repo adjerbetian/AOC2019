@@ -9,17 +9,9 @@ import java.io.File
 import java.time.Duration
 
 fun main() {
-//    runPart1_BFS() // == 5102
     runPart1_DFS() // == 5102
-    runPart2()
-}
-
-fun runPart1_BFS() {
-    val textMap = readInput("src/day18/input-part1.txt")
-    val vault = Vault(textMap)
-    val graph = VaultGraphImpl(vault)
-    val explorer = VaultExplorerBFS(graph, 100000)
-    println(explorer.getBestKeyPath())
+    runPart1_BFS() // == 5102
+//    runPart2()
 }
 
 private fun runPart1_DFS() {
@@ -27,8 +19,19 @@ private fun runPart1_DFS() {
     val vault = Vault(textMap)
     val graph = VaultGraphImpl(vault)
     val explorer = VaultExplorerDFS(graph)
+
     val (path, length) = explorer.getBestKeyPath()
-    println("The best length is $length for the path $path")
+    println("DFS - The best length is $length for the path $path")
+}
+
+private fun runPart1_BFS() {
+    val textMap = readInput("src/day18/input-part1.txt")
+    val vault = Vault(textMap)
+    val graph = VaultGraphImpl(vault)
+    val explorer = VaultExplorerBFS(graph)
+
+    val (path, length) = explorer.getBestKeyPath()
+    println("BFS - The best length is $length for the path $path")
 }
 
 private fun runPart2() {

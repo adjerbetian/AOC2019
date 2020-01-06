@@ -4,22 +4,29 @@ import day18.vault.KeyPath
 import day18.vaultGraph.VaultGraph
 import day18.vaultGraph.buildVaultGraph
 
-class VaultExplorerBFS(private val graph: VaultGraph, private val size: Int) : VaultExplorer {
-    constructor(textMap: String, size: Int) : this(buildVaultGraph(textMap), size)
+class VaultExplorerBFS(private val graph: VaultGraph) : VaultExplorer {
+    private val pathMemory = KeyPathMemory()
+
+    constructor(textMap: String) : this(buildVaultGraph(textMap))
 
     override fun getBestKeyPath(): KeyPath {
         var keyPaths = listOf(KeyPath(emptyList(), 0))
 
-        for (i in graph.keys.indices) {
+        for (i in graph.keys.indices)
             keyPaths = keyPaths.flatMap { explorePossibleKeyPaths(it) }
-                .sortedBy { it.length }
-                .take(size)
-            println("$i / ${graph.keys.size}")
-        }
-        return keyPaths.first()
+
+        return keyPaths.minBy { it.length }!!
     }
 
     private fun explorePossibleKeyPaths(keyPath: KeyPath) =
         graph.getAvailableKeyDistancesFrom(keyPath.last, keyPath.keys)
             .map { keyPath + it }
+            .filter {
+                if (pathMemory.hasSmaller(it))
+                    false
+                else {
+                    pathMemory.add(it)
+                    true
+                }
+            }
 }

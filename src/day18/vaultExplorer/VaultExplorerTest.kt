@@ -11,7 +11,7 @@ import kotlin.test.assertEquals
 class VaultExplorerTest {
     private val factories = listOf(
         Factory("DFS") { map -> VaultExplorerDFS(map) },
-        Factory("BFS") { map -> VaultExplorerBFS(map, 100) }
+        Factory("BFS") { map -> VaultExplorerBFS(map) }
     )
 
     private val testCases = listOf(
@@ -23,8 +23,7 @@ class VaultExplorerTest {
                 #########
             """,
             8,
-            "a, b",
-            true
+            "a, b"
         ),
         TestCase(
             "second",
@@ -48,11 +47,26 @@ class VaultExplorerTest {
                 ########################
             """,
             132,
-            "b, a, c, d, f, e, g",
-            true
+            "b, a, c, d, f, e, g"
         ),
         TestCase(
             "fourth",
+            """
+                #################
+                #i.G..c...e..H.p#
+                ########.########
+                #j.A..b...f..D.o#
+                ########@########
+                #k.E..a...g..B.n#
+                ########.########
+                #l.F..d...h..C.m#
+                #################
+            """,
+            136,
+            "b, f, g, n, c, i, e, a, k, d, l, h, m, j, o, p"
+        ),
+        TestCase(
+            "fifth",
             """
                 ########################
                 #@..............ac.GI.b#
@@ -62,69 +76,29 @@ class VaultExplorerTest {
                 ########################
             """,
             81,
-            "a, c, f, i, d, g, b, e, h",
-            true
+            "a, c, f, i, d, g, b, e, h"
         )
     )
 
     @TestFactory
-    fun getBestKeyPath() = testCases.filter { !it.skip }.flatMap { test ->
+    fun getBestKeyPath() = testCases.flatMap { test ->
         factories.map { factory ->
             DynamicTest.dynamicTest(test.name + " - " + factory.name) {
                 val explorer = factory.function(test.getGraph())
 
-                assertEquals(test.getExpectedPath(), explorer.getBestKeyPath().path)
-                assertEquals(test.getExpectedLength(), explorer.getBestKeyPath().length)
+                val bestKeyPath = explorer.getBestKeyPath()
+
+                assertEquals(test.getExpectedPath(), bestKeyPath.path)
+                assertEquals(test.getExpectedLength(), bestKeyPath.length)
             }
         }
-    }
-
-    @Disabled // works but is too long
-    @Test
-    fun trickyComplexCaseBFS() {
-        val explorer = VaultExplorerBFS(
-            """
-                #################
-                #i.G..c...e..H.p#
-                ########.########
-                #j.A..b...f..D.o#
-                ########@########
-                #k.E..a...g..B.n#
-                ########.########
-                #l.F..d...h..C.m#
-                #################
-            """.trimIndent(),
-            100000
-        )
-
-        assertEquals(136, explorer.getBestKeyPath().length)
-    }
-
-    @Test
-    fun trickyComplexCaseDFS() {
-        val explorer = VaultExplorerDFS(
-            """
-                #################
-                #i.G..c...e..H.p#
-                ########.########
-                #j.A..b...f..D.o#
-                ########@########
-                #k.E..a...g..B.n#
-                ########.########
-                #l.F..d...h..C.m#
-                #################
-            """.trimIndent()
-        )
-
-        assertEquals(136, explorer.getBestKeyPath().length)
     }
 
     data class TestCase(
         val name: String,
         private val graph: String,
         private val distance: Int,
-        private val path: String,
-        val skip: Boolean = false
+        private val path: String
     ) {
         fun getGraph() = graph.trimIndent()
         fun getExpectedLength() = distance
