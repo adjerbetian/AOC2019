@@ -4,24 +4,19 @@ import day18.vault.Entrance
 import day18.vault.Key
 import day18.vaultGraph.VaultGraph
 import day18.vaultGraph.buildVaultGraph
-import java.time.Instant
 
 class VaultExplorerDFS(private val graph: VaultGraph) : VaultExplorer {
-    private val progressPrinter = ProgressPrinter(this)
-    var bestPathLength = Int.MAX_VALUE
-    private var bestPath: List<Key> = emptyList()
-    var start: Instant = Instant.now()
     private var pathMemory = KeyPathMemory()
+    private var bestPathLength = Int.MAX_VALUE
+    private var bestPath: List<Key> = emptyList()
 
     constructor(textMap: String) : this(buildVaultGraph(textMap))
 
     override fun getBestKeyPath(): Pair<List<Key>, Int> {
         bestPathLength = Int.MAX_VALUE
-        start = Instant.now()
         pathMemory = KeyPathMemory()
 
         explorePossibleKeyPaths()
-        progressPrinter.printProgress()
         return Pair(bestPath, bestPathLength)
     }
 
@@ -36,22 +31,11 @@ class VaultExplorerDFS(private val graph: VaultGraph) : VaultExplorer {
         }
     }
 
-    private fun explorePossibleKeyPaths(
-        keyPath: MutableList<Key>,
-        pathLength: Int
-    ) {
-        if (pathMemory[keyPath] <= pathLength) {
-            progressPrinter.trackProgress("KeyCut")
-            return
-        }
+    private fun explorePossibleKeyPaths(keyPath: MutableList<Key>, pathLength: Int) {
+        if (pathMemory[keyPath] <= pathLength) return
         pathMemory[keyPath] = pathLength
 
-        val keys = keyPath.toSet()
-
-        if (pathLength >= bestPathLength) {
-            progressPrinter.trackProgress("Path")
-            return
-        }
+        if (pathLength >= bestPathLength) return
 
         if (keyPath.size == graph.keys.size) {
             bestPathLength = pathLength
@@ -59,13 +43,10 @@ class VaultExplorerDFS(private val graph: VaultGraph) : VaultExplorer {
             println("\nfound key path of length $bestPathLength : $bestPath")
         }
 
-        val maxD = graph.getMaxDistanceToKey(keyPath.last(), keys)
-        if (pathLength + maxD >= bestPathLength) {
-            progressPrinter.trackProgress("Max D")
-            return
-        }
+        val maxD = graph.getMaxDistanceToKey(keyPath.last(), keyPath.toSet())
+        if (pathLength + maxD >= bestPathLength) return
 
-        val newKeys = graph.getAvailableKeyDistancesFrom(keyPath.last(), keys)
+        val newKeys = graph.getAvailableKeyDistancesFrom(keyPath.last(), keyPath.toSet())
 
         newKeys.forEach {
             keyPath.add(it.key)
