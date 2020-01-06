@@ -6,7 +6,7 @@ import day18.vault.TunnelElement
 interface VaultGraph {
     val keys: Set<Key>
     fun getAvailableKeyDistancesFrom(element: TunnelElement, keys: Set<Key>): List<KeyDistance>
-    fun getMaxDistanceToKey(key: Key, keys: Set<Key>): Int
+    fun getMaxDistanceToKey(element: TunnelElement, keys: Set<Key>): Int
     fun getDistancesToKeysFrom(element: TunnelElement): List<Int>
 }
 

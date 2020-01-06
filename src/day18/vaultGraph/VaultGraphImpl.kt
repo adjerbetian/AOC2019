@@ -117,8 +117,8 @@ class VaultGraphImpl(private val vault: Vault) : VaultGraph {
             .map { it.second }
     }
 
-    override fun getMaxDistanceToKey(key: Key, keys: Set<Key>): Int {
-        return precomputedKeys.getValue(key)
+    override fun getMaxDistanceToKey(element: TunnelElement, keys: Set<Key>): Int {
+        return precomputedKeys.getValue(element)
             .filter { !keys.contains(it.second.key) }
             .map { it.second.distance }
             .max() ?: 0

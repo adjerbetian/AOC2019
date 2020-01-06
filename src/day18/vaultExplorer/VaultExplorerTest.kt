@@ -5,7 +5,6 @@ import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.DynamicTest
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestFactory
-import java.time.Duration
 import kotlin.test.assertEquals
 
 
@@ -74,8 +73,8 @@ class VaultExplorerTest {
             DynamicTest.dynamicTest(test.name + " - " + factory.name) {
                 val explorer = factory.function(test.getGraph())
 
-                assertEquals(test.getExpectedPath(), explorer.getBestKeyPath().first)
-                assertEquals(test.getExpectedDistance(), explorer.getBestKeyPath().second)
+                assertEquals(test.getExpectedPath(), explorer.getBestKeyPath().path)
+                assertEquals(test.getExpectedLength(), explorer.getBestKeyPath().length)
             }
         }
     }
@@ -98,7 +97,7 @@ class VaultExplorerTest {
             100000
         )
 
-        assertEquals(136, explorer.getBestKeyPath().second)
+        assertEquals(136, explorer.getBestKeyPath().length)
     }
 
     @Test
@@ -117,7 +116,7 @@ class VaultExplorerTest {
             """.trimIndent()
         )
 
-        assertEquals(136, explorer.getBestKeyPath().second)
+        assertEquals(136, explorer.getBestKeyPath().length)
     }
 
     data class TestCase(
@@ -128,7 +127,7 @@ class VaultExplorerTest {
         val skip: Boolean = false
     ) {
         fun getGraph() = graph.trimIndent()
-        fun getExpectedDistance() = distance
+        fun getExpectedLength() = distance
         fun getExpectedPath() = keysOf(path)
 
         private fun keysOf(keys: String) =

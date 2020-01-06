@@ -10,7 +10,7 @@ import java.time.Duration
 
 fun main() {
 //    runPart1_BFS() // == 5102
-//    runPart1_DFS() // == 5102
+    runPart1_DFS() // == 5102
     runPart2()
 }
 
@@ -27,7 +27,8 @@ private fun runPart1_DFS() {
     val vault = Vault(textMap)
     val graph = VaultGraphImpl(vault)
     val explorer = VaultExplorerDFS(graph)
-    println(explorer.getBestKeyPath())
+    val (path, length) = explorer.getBestKeyPath()
+    println("The best length is $length for the path $path")
 }
 
 private fun runPart2() {

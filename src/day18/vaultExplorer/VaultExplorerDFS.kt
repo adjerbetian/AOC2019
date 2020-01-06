@@ -1,73 +1,53 @@
 package day18.vaultExplorer
 
-import day18.vault.Entrance
-import day18.vault.Key
+import day18.vault.KeyPath
 import day18.vaultGraph.VaultGraph
 import day18.vaultGraph.buildVaultGraph
 
 class VaultExplorerDFS(private val graph: VaultGraph) : VaultExplorer {
-    private var pathMemory = KeyPathMemory()
-    private var bestPathLength = Int.MAX_VALUE
-    private var bestPath: List<Key> = emptyList()
+    private val pathMemory = KeyPathMemory()
+    private var bestPath = KeyPath(emptyList(), Int.MAX_VALUE)
 
     constructor(textMap: String) : this(buildVaultGraph(textMap))
 
-    override fun getBestKeyPath(): Pair<List<Key>, Int> {
-        bestPathLength = Int.MAX_VALUE
-        pathMemory = KeyPathMemory()
-        bestPath = emptyList()
-
-        explorePossibleKeyPaths()
-
-        return Pair(bestPath, bestPathLength)
+    override fun getBestKeyPath(): KeyPath {
+        explorePossibleKeyPaths(KeyPath(emptyList(), 0))
+        return bestPath
     }
 
-    private fun explorePossibleKeyPaths() {
-        val keyPath = mutableListOf<Key>()
-        val newKeys = graph.getAvailableKeyDistancesFrom(Entrance, keyPath.toSet())
+    private fun explorePossibleKeyPaths(keyPath: KeyPath) {
+        if (pathMemory.hasSmaller(keyPath)) return
+        pathMemory.add(keyPath)
 
-        newKeys.forEach {
-            keyPath.add(it.key)
-            explorePossibleKeyPaths(keyPath, it.distance)
-            keyPath.removeAt(keyPath.lastIndex)
-        }
-    }
-
-    private fun explorePossibleKeyPaths(keyPath: MutableList<Key>, pathLength: Int) {
-        if (pathMemory[keyPath] <= pathLength) return
-        pathMemory[keyPath] = pathLength
-
-        if (pathLength + getMinRemainingDistance(keyPath) >= bestPathLength) return
+        if (keyPath.length + getMinRemainingDistance(keyPath) >= bestPath.length) return
 
         if (keyPath.size == graph.keys.size) {
-            bestPathLength = pathLength
-            bestPath = keyPath.map { it }
-            println("\nfound key path of length $bestPathLength : $bestPath")
+            bestPath = keyPath
             return
         }
 
         getNextKeys(keyPath).forEach {
-            keyPath.add(it.key)
-            explorePossibleKeyPaths(
-                keyPath,
-                pathLength + it.distance
-            )
-            keyPath.removeAt(keyPath.lastIndex)
+            explorePossibleKeyPaths(keyPath + it)
         }
     }
 
-    private fun getMinRemainingDistance(keyPath: List<Key>) = graph.getMaxDistanceToKey(keyPath.last(), keyPath.toSet())
-    private fun getNextKeys(keyPath: List<Key>) = graph.getAvailableKeyDistancesFrom(keyPath.last(), keyPath.toSet())
+    private fun getMinRemainingDistance(keyPath: KeyPath) =
+        graph.getMaxDistanceToKey(keyPath.last, keyPath.keys)
+
+    private fun getNextKeys(keyPath: KeyPath) =
+        graph.getAvailableKeyDistancesFrom(keyPath.last, keyPath.keys)
 }
 
 private class KeyPathMemory {
     private val pathMemory = HashMap<String, Int>()
 
-    operator fun get(keyPath: List<Key>) = pathMemory.getOrDefault(buildPositionPathHash(keyPath), Int.MAX_VALUE)
-    operator fun set(keyPath: List<Key>, distance: Int) {
-        pathMemory[buildPositionPathHash(keyPath)] = distance
+    fun hasSmaller(keyPath: KeyPath) =
+        pathMemory.getOrDefault(buildPositionPathHash(keyPath), Int.MAX_VALUE) <= keyPath.length
+
+    fun add(keyPath: KeyPath) {
+        pathMemory[buildPositionPathHash(keyPath)] = keyPath.length
     }
 
-    private fun buildPositionPathHash(keyPath: List<Key>) =
-        keyPath.last().letter + "." + keyPath.sortedBy { it.letter }.joinToString("")
+    private fun buildPositionPathHash(keyPath: KeyPath) =
+        keyPath.last.letter + "." + keyPath.path.sortedBy { it.letter }.joinToString("")
 }
