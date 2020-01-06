@@ -4,7 +4,6 @@ import day18.vault.Vault
 import day18.vault.splitVaultMaps
 import day18.vaultExplorer.VaultExplorerBFS
 import day18.vaultExplorer.VaultExplorerDFS
-import day18.vaultExplorer.VaultsExplorerDFS
 import day18.vaultGraph.VaultGraphImpl
 import java.io.File
 import java.time.Duration
@@ -39,7 +38,6 @@ private fun runPart2() {
 
     val vaults = textMaps.map { Vault(it) }
     val graphs = vaults.map { VaultGraphImpl(it) }
-    val explorer = VaultsExplorerDFS(graphs)
 }
 
 private fun readInput(stringPath: String): String {
