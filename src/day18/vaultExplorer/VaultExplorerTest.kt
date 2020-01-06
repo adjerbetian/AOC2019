@@ -11,7 +11,7 @@ import kotlin.test.assertEquals
 
 class VaultExplorerTest {
     private val factories = listOf(
-        Factory("DFS") { map -> VaultExplorerDFS(map, Duration.ofSeconds(1)) },
+        Factory("DFS") { map -> VaultExplorerDFS(map) },
         Factory("BFS") { map -> VaultExplorerBFS(map, 100) }
     )
 
@@ -114,8 +114,7 @@ class VaultExplorerTest {
                 ########.########
                 #l.F..d...h..C.m#
                 #################
-            """.trimIndent(),
-            Duration.ofSeconds(20)
+            """.trimIndent()
         )
 
         assertEquals(136, explorer.getBestKeyPath().second)

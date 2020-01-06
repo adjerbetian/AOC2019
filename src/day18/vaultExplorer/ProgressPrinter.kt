@@ -10,20 +10,17 @@ class ProgressPrinter(private val explorerDFS: VaultExplorerDFS) {
 
     fun trackProgress(type: String) {
         counters[type] = (counters[type] ?: 0) + 1
-        printProgress()
+
+        if (Duration.between(lastLog, Instant.now()) > LOG_INTERVAL)
+            printProgress()
     }
 
-    private fun printProgress() {
-        if (Duration.between(lastLog, Instant.now()) > LOG_INTERVAL) {
-            val remainingTime = explorerDFS.maxDuration - Duration.between(explorerDFS.start, Instant.now())
+    fun printProgress() {
+        counters.entries.forEach { println("${it.key} : ${prettyInt(it.value)}") }
+        println("best path length: ${explorerDFS.bestPathLength}")
+        println("---")
 
-            counters.entries.forEach { println("${it.key} : ${prettyInt(it.value)}") }
-            println("best path length: ${explorerDFS.bestPathLength}")
-            println("Remaining: ${remainingTime.seconds}s")
-            println("---")
-
-            lastLog = Instant.now()
-        }
+        lastLog = Instant.now()
     }
 
     private fun prettyInt(n: Long): String {

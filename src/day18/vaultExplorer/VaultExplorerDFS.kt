@@ -4,29 +4,24 @@ import day18.vault.Entrance
 import day18.vault.Key
 import day18.vaultGraph.VaultGraph
 import day18.vaultGraph.buildVaultGraph
-import java.time.Duration
 import java.time.Instant
 
-class VaultExplorerDFS(private val graph: VaultGraph, val maxDuration: Duration) : VaultExplorer {
+class VaultExplorerDFS(private val graph: VaultGraph) : VaultExplorer {
     private val progressPrinter = ProgressPrinter(this)
     var bestPathLength = Int.MAX_VALUE
     private var bestPath: List<Key> = emptyList()
     var start: Instant = Instant.now()
-    private val summedDistances = graph.keys
-        .flatMap { graph.getDistancesToKeysFrom(it) }
-        .sorted()
-        .subList(0, graph.keys.size)
-        .fold(listOf(0)) { result, distance -> result + (result.last() + distance) }
-    private var pathMemory = HashMap<String, Int>()
+    private var pathMemory = KeyPathMemory()
 
-    constructor(textMap: String, maxTime: Duration) : this(buildVaultGraph(textMap), maxTime)
+    constructor(textMap: String) : this(buildVaultGraph(textMap))
 
     override fun getBestKeyPath(): Pair<List<Key>, Int> {
         bestPathLength = Int.MAX_VALUE
         start = Instant.now()
-        pathMemory = HashMap()
+        pathMemory = KeyPathMemory()
 
         explorePossibleKeyPaths()
+        progressPrinter.printProgress()
         return Pair(bestPath, bestPathLength)
     }
 
@@ -45,15 +40,11 @@ class VaultExplorerDFS(private val graph: VaultGraph, val maxDuration: Duration)
         keyPath: MutableList<Key>,
         pathLength: Int
     ) {
-        fun getPathMemoryHash() = keyPath.last().letter + "." + keyPath.map { it }.sortedBy { it.letter }.joinToString("")
-
-        if (pathMemory[getPathMemoryHash()] ?: Int.MAX_VALUE <= pathLength) {
+        if (pathMemory[keyPath] <= pathLength) {
             progressPrinter.trackProgress("KeyCut")
             return
         }
-        pathMemory[getPathMemoryHash()] = pathLength
-
-        if (Duration.between(start, Instant.now()) > maxDuration) return
+        pathMemory[keyPath] = pathLength
 
         val keys = keyPath.toSet()
 
@@ -74,11 +65,6 @@ class VaultExplorerDFS(private val graph: VaultGraph, val maxDuration: Duration)
             return
         }
 
-        if (pathLength + summedDistances[graph.keys.size - keyPath.size] >= bestPathLength) {
-            progressPrinter.trackProgress("Min D")
-            return
-        }
-
         val newKeys = graph.getAvailableKeyDistancesFrom(keyPath.last(), keys)
 
         newKeys.forEach {
@@ -90,4 +76,16 @@ class VaultExplorerDFS(private val graph: VaultGraph, val maxDuration: Duration)
             keyPath.removeAt(keyPath.lastIndex)
         }
     }
+}
+
+private class KeyPathMemory {
+    private val pathMemory = HashMap<String, Int>()
+
+    operator fun get(keyPath: List<Key>) = pathMemory.getOrDefault(buildPositionPathHash(keyPath), Int.MAX_VALUE)
+    operator fun set(keyPath: List<Key>, distance: Int) {
+        pathMemory[buildPositionPathHash(keyPath)] = distance
+    }
+
+    private fun buildPositionPathHash(keyPath: List<Key>) =
+        keyPath.last().letter + "." + keyPath.sortedBy { it.letter }.joinToString("")
 }

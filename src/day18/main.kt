@@ -25,7 +25,7 @@ fun runPart1_DFS() {
     val textMap = readInput("src/day18/input-part1.txt")
     val vault = Vault(textMap)
     val graph = VaultGraphImpl(vault)
-    val explorer = VaultExplorerDFS(graph, Duration.ofSeconds(200))
+    val explorer = VaultExplorerDFS(graph)
     println(explorer.getBestKeyPath())
 }
 
